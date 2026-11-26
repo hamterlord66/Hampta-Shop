@@ -14,7 +14,7 @@ The auction house uses a local SQLite database. Its JDBC driver is bundled into 
 
 ## Install
 
-1. Download `Hampta-Shop-1.0.0.jar` from the GitHub Actions **hampta-shop** artifact or build it locally.
+1. Download `Hampta-Shop-1.1.0.jar` from the GitHub Actions **hampta-shop** artifact or build it locally.
 2. Put the JAR in the server's `plugins` folder.
 3. Ensure Vault and an economy provider are installed, then restart the server.
 4. Configure shop items and auction fees in `plugins/HamptaShop/config.yml`.
@@ -25,7 +25,7 @@ The auction house uses a local SQLite database. Its JDBC driver is bundled into 
 mvn --batch-mode clean verify
 ```
 
-The distributable JAR is `target/Hampta-Shop-1.0.0.jar`. The GitHub Actions workflow at `.github/workflows/build.yml` builds the plugin on pushes, pull requests, tags, or manual dispatch and uploads the JAR as an artifact.
+The distributable JAR is `target/Hampta-Shop-1.1.0.jar`. The GitHub Actions workflow at `.github/workflows/build.yml` builds the plugin on pushes, pull requests, tags, or manual dispatch and uploads the JAR as an artifact.
 
 ## Commands
 
@@ -34,13 +34,33 @@ The distributable JAR is `target/Hampta-Shop-1.0.0.jar`. The GitHub Actions work
 | `/shop` | Open the category browser |
 | `/shop <category>` | Open a category |
 | `/shop search <words>` | Search the configured shop |
-| `/sell hand` | Sell the held stack when it matches a shop item |
-| `/sell all` | Sell all configured shop items in your inventory |
+| `/shop buy <item-id> [amount]` | Buy a configured item directly; supports up to 2,304 items if they fit |
+| `/shop sell <item-id> [amount\|all]` | Sell a configured item directly |
+| `/shop sort <name\|buy\|sell>` | Browse the whole shop sorted by name or price |
+| `/shop favorite <item-id>` | Toggle an item in your saved favorites |
+| `/shop favorites` | Browse only your saved favorite items |
+| `/sell hand [amount]` | Sell some or all of a matching held stack |
+| `/sell all` | Preview a sale and request confirmation |
+| `/sell confirm` | Confirm a pending bulk sale within 30 seconds |
+| `/sell cancel` | Cancel a pending bulk sale |
+| `/sell preview` | Preview the current inventory's sell value |
+| `/sell hotbar` | Sell configured shop items in the hotbar |
+| `/sell category <name>` | Sell configured items from one category |
 | `/ah` | Browse active buy-now listings |
-| `/ah sell <price>` | List the held item stack |
-| `/ah mine` | Show your active listing IDs |
+| `/ah sell <price> [amount]` | List the held item stack or a chosen quantity |
+| `/ah search <words>` | Search active listings by seller or serialized item details |
+| `/ah sort <newest\|cheapest\|expensive\|ending>` | Sort the market |
+| `/ah mine` | Open your active listings; click one to cancel and return it |
 | `/ah cancel <id>` | Cancel your listing and return its item |
+| `/ah cancelall confirm` | Cancel all your active listings |
+| `/ah watch <player>` / `/ah unwatch <player>` | Subscribe or unsubscribe to online seller listing alerts |
+| `/ah info <id>` | Inspect listing details |
+| `/ah stats` | Show active-market and personal listing counts |
+| `/ah refresh` | Refresh the market |
 | `/ah claim` | Claim returned auction items |
+| `/ec` | Open your personal ender chest |
+| `/craft` | Open a functional virtual crafting table |
+| `/anvil` | Open a functional virtual anvil |
 | `/hamptashop reload` | Reload the shop configuration |
 | `/hamptashop preset list` | List built-in and saved economy presets |
 | `/hamptashop preset <name>` | Apply a preset (creates a config backup first) |
@@ -53,6 +73,20 @@ The distributable JAR is `target/Hampta-Shop-1.0.0.jar`. The GitHub Actions work
 Shop GUI: left-click buys one item, shift-left-click buys 16, right-click sells one, and shift-right-click sells all matching items. Built-in presets are `balanced`, `hardcore`, and `generous`. Applying a preset replaces shop categories/items and auction settings, while leaving other settings untouched; the previous `config.yml` is backed up under `plugins/HamptaShop/backups/`.
 
 Price modifiers can give permission groups discounts and improved sale prices. Assign the configured permission to a LuckPerms group (for example, `/lp group vip permission set hamptashop.discount.vip true`). Only the highest applicable discount and highest sell bonus are used; they do not stack. Discounts are capped at 90% and sell bonuses at 100%.
+
+### Shop: 20 capabilities
+
+1. Category GUI; 2. category commands; 3. paginated item browsing; 4. search by ID, name, or material; 5. one-click buy; 6. shift-buy 16; 7. direct quantity buys; 8. buys split into multiple stacks; 9. inventory-fit precheck; 10. one-click sell; 11. shift-sell matching items; 12. direct quantity sells; 13. item-specific selling; 14. sort by name; 15. sort by buy price; 16. sort by sell price; 17. favorites toggle in the GUI; 18. favorite commands; 19. persistent favorite-only browsing; 20. LuckPerms discounts and sell bonuses.
+
+### Selling: 15 capabilities
+
+1. Sell the held stack; 2. sell an exact held quantity; 3. preview sell value; 4. preview bulk inventory sales; 5. confirm bulk sales; 6. cancel pending sales; 7. 30-second confirmation expiry; 8. sell hotbar items; 9. sell a category; 10. sell configured catalog items only; 11. direct `/shop sell`; 12. partial direct quantities; 13. right-click one item in shop; 14. shift-right-click all matching items; 15. restore items if Vault rejects a deposit.
+
+### Auction house: 21 capabilities
+
+1. Paginated buy-now market; 2. search listings; 3. sort newest; 4. sort cheapest; 5. sort most expensive; 6. sort ending soon; 7. list the held stack; 8. list a partial stack; 9. per-player listing cap; 10. configurable price bounds; 11. expiry; 12. listing fee; 13. sale fee; 14. two-click purchase confirmation; 15. personal listings GUI; 16. click-to-cancel own listing; 17. cancel by ID; 18. cancel-all confirmation; 19. seller watch subscriptions; 20. online watched-seller alerts; 21. listing info and market statistics.
+
+These features are backed by SQLite auction persistence and player preferences in `players.yml`. Expired or cancelled items are returned safely, and players can refresh the market with `/ah refresh`.
 
 ## Configuration and placeholders
 

@@ -11,7 +11,8 @@ final class MenuHolder implements InventoryHolder {
     enum Kind {
         CATEGORIES,
         ITEMS,
-        AUCTION
+        AUCTION,
+        AUCTION_MINE
     }
 
     final Kind kind;
@@ -19,15 +20,23 @@ final class MenuHolder implements InventoryHolder {
     final String category;
     final String query;
     final int page;
+    final String sort;
+    final boolean favoritesOnly;
     final Map<Integer, Long> listingsBySlot = new HashMap<>();
     Inventory inventory;
 
     MenuHolder(Kind kind, UUID owner, String category, String query, int page) {
+        this(kind, owner, category, query, page, "name", false);
+    }
+
+    MenuHolder(Kind kind, UUID owner, String category, String query, int page, String sort, boolean favoritesOnly) {
         this.kind = kind;
         this.owner = owner;
         this.category = category;
         this.query = query;
         this.page = page;
+        this.sort = sort;
+        this.favoritesOnly = favoritesOnly;
     }
 
     @Override

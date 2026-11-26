@@ -45,12 +45,42 @@ final class AuctionHouseDatabase implements AutoCloseable {
     }
 
     List<AuctionListing> listActive(int limit, int offset) throws SQLException {
-        String sql = "SELECT * FROM listings WHERE expires_at > ? ORDER BY created_at DESC LIMIT ? OFFSET ?";
+        return listActive(limit, offset, "newest", "");
+    }
+
+    List<AuctionListing> listActive(int limit, int offset, String sort, String query) throws SQLException {
+        String order = switch (sort.toLowerCase(java.util.Locale.ROOT)) {
+            case "cheapest" -> "price ASC, created_at DESC";
+            case "expensive" -> "price DESC, created_at DESC";
+            case "ending" -> "expires_at ASC, created_at DESC";
+            default -> "created_at DESC";
+        };
+        String sql = "SELECT * FROM listings WHERE expires_at > ? "
+                + "AND (? = '' OR seller_name LIKE ? OR item_yaml LIKE ?) "
+                + "ORDER BY " + order + " LIMIT ? OFFSET ?";
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setLong(1, System.currentTimeMillis());
-            statement.setInt(2, limit);
-            statement.setInt(3, offset);
+            statement.setString(2, query == null ? "" : query);
+            statement.setString(3, "%" + (query == null ? "" : query) + "%");
+            statement.setString(4, "%" + (query == null ? "" : query) + "%");
+            statement.setInt(5, limit);
+            statement.setInt(6, offset);
             return readListings(statement);
+        }
+    }
+
+    int countActive(String query) throws SQLException {
+        try (PreparedStatement statement = connection.prepareStatement(
+                "SELECT COUNT(*) FROM listings WHERE expires_at > ? "
+                        + "AND (? = '' OR seller_name LIKE ? OR item_yaml LIKE ?)")) {
+            String value = query == null ? "" : query;
+            statement.setLong(1, System.currentTimeMillis());
+            statement.setString(2, value);
+            statement.setString(3, "%" + value + "%");
+            statement.setString(4, "%" + value + "%");
+            try (ResultSet result = statement.executeQuery()) {
+                return result.next() ? result.getInt(1) : 0;
+            }
         }
     }
 

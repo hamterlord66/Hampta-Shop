@@ -9,19 +9,28 @@ softdepend: [PlaceholderAPI, LuckPerms]
 commands:
   shop:
     description: Browse the Hampta Shop.
-    usage: /shop [category|search <query>]
+    usage: /shop [category|search|buy|sell|favorite|favorites|sort]
     aliases: [store]
   sell:
     description: Sell items to the server shop.
-    usage: /sell <hand|all>
+    usage: /sell <hand|all|hotbar|category|preview|confirm>
   ah:
     description: Browse and manage auction house listings.
-    usage: /ah [sell <price>|mine|cancel <id>|claim]
+    usage: /ah [search|sort|sell <price>|mine|cancel <id>|claim]
     aliases: [auction, auctionhouse]
   hamptashop:
     description: Hampta Shop administration.
     usage: /hamptashop <reload|preset|admin>
     aliases: [hs]
+  ec:
+    description: Open your ender chest.
+    usage: /ec
+  craft:
+    description: Open a crafting table.
+    usage: /craft
+  anvil:
+    description: Open an anvil.
+    usage: /anvil
 permissions:
   hamptashop.use:
     description: Use the shop and auction house.
@@ -47,3 +56,18 @@ permissions:
   hamptashop.preset.manage:
     description: Save and delete custom economy presets.
     default: op
+  hamptashop.utility.enderchest:
+    description: Open your ender chest with /ec.
+    default: true
+  hamptashop.utility.crafting:
+    description: Open a virtual crafting table with /craft.
+    default: true
+  hamptashop.utility.anvil:
+    description: Open a virtual anvil with /anvil.
+    default: true
+  hamptashop.ah.search:
+    description: Search and sort auction listings.
+    default: true
+  hamptashop.ah.cancel:
+    description: Cancel your own auction listings.
+    default: true

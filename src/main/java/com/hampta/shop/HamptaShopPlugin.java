@@ -5,7 +5,6 @@ import net.milkbowl.vault.economy.EconomyResponse;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -51,7 +50,16 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
     private YamlConfiguration messages;
     private YamlConfiguration presets;
     private File presetsFile;
+    private YamlConfiguration playerData;
+    private File playerDataFile;
+    private final Map<UUID, SellConfirmation> sellConfirmations = new HashMap<>();
+    private final Map<UUID, AuctionBuyConfirmation> auctionBuyConfirmations = new HashMap<>();
 
+    private record SellConfirmation(Map<String, Integer> amounts, boolean hotbarOnly, long expiresAt) {
+    }
+
+    private record AuctionBuyConfirmation(long listingId, long expiresAt) {
+    }
     @Override
     public void onEnable() {
         saveDefaultConfig();
@@ -60,6 +68,8 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
         messages = YamlConfiguration.loadConfiguration(new java.io.File(getDataFolder(), "messages.yml"));
         presetsFile = new File(getDataFolder(), "presets.yml");
         presets = YamlConfiguration.loadConfiguration(presetsFile);
+        playerDataFile = new File(getDataFolder(), "players.yml");
+        playerData = YamlConfiguration.loadConfiguration(playerDataFile);
         setupEconomy();
         if (!isEnabled()) {
             return;
@@ -71,7 +81,7 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
-        for (String commandName : List.of("shop", "sell", "ah", "hamptashop")) {
+        for (String commandName : List.of("shop", "sell", "ah", "hamptashop", "ec", "craft", "anvil")) {
             PluginCommand command = getCommand(commandName);
             if (command == null) {
                 getLogger().severe("Missing command registration: " + commandName);
@@ -130,6 +140,9 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
             case "sell" -> handleSell(sender, args);
             case "ah" -> handleAuction(sender, args);
             case "hamptashop" -> handleAdmin(sender, args);
+            case "ec" -> handleUtility(sender, "enderchest");
+            case "craft" -> handleUtility(sender, "crafting");
+            case "anvil" -> handleUtility(sender, "anvil");
             default -> false;
         };
     }
@@ -147,21 +160,80 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
             openCategories(player);
             return true;
         }
-        if (args[0].equalsIgnoreCase("search")) {
-            if (args.length < 2) {
-                send(player, "search-prompt");
-            } else {
-                openShopItems(player, null, String.join(" ", Arrays.copyOfRange(args, 1, args.length)), 0);
+        switch (args[0].toLowerCase(Locale.ROOT)) {
+            case "search" -> {
+                if (args.length < 2) {
+                    send(player, "search-prompt");
+                } else {
+                    openShopItems(player, null, String.join(" ", Arrays.copyOfRange(args, 1, args.length)), 0);
+                }
+                return true;
             }
-            return true;
+            case "favorites", "favourites" -> {
+                openShopItems(player, null, "", 0, "name", true);
+                return true;
+            }
+            case "favorite", "favourite" -> {
+                String favoriteId = args.length == 2 ? findItemId(args[1]) : null;
+                if (favoriteId == null) {
+                    send(player, "invalid-usage", "usage", "/shop favorite <item-id>");
+                    return true;
+                }
+                toggleFavorite(player, favoriteId);
+                return true;
+            }
+            case "buy" -> {
+                if (args.length < 2 || args.length > 3) {
+                    send(player, "invalid-usage", "usage", "/shop buy <item-id> [amount]");
+                    return true;
+                }
+                String id = findItemId(args[1]);
+                int amount = args.length == 3 ? parseAmount(args[2]) : 1;
+                if (id == null) {
+                    send(player, "unknown-item");
+                } else if (amount < 1 || amount > 2304) {
+                    send(player, "invalid-number");
+                } else {
+                    buyFromShop(player, id, amount);
+                }
+                return true;
+            }
+            case "sell" -> {
+                if (args.length < 2 || args.length > 3) {
+                    send(player, "invalid-usage", "usage", "/shop sell <item-id> [amount|all]");
+                    return true;
+                }
+                String id = findItemId(args[1]);
+                int amount = args.length == 2 || args[2].equalsIgnoreCase("all")
+                        ? Integer.MAX_VALUE : parseAmount(args[2]);
+                if (!player.hasPermission("hamptashop.sell")) {
+                    send(player, "no-permission");
+                } else if (id == null || amount < 1) {
+                    send(player, id == null ? "unknown-item" : "invalid-number");
+                } else if (sellMatching(player, id, amount) == 0) {
+                    send(player, "sell-empty");
+                }
+                return true;
+            }
+            case "sort" -> {
+                if (args.length != 2 || !List.of("name", "buy", "sell").contains(args[1].toLowerCase(Locale.ROOT))) {
+                    send(player, "invalid-usage", "usage", "/shop sort <name|buy|sell>");
+                } else {
+                    openShopItems(player, null, "", 0, args[1].toLowerCase(Locale.ROOT), false);
+                }
+                return true;
+            }
+            default -> {
+                String category = findCategory(args[0]);
+                if (category == null) {
+                    send(player, "invalid-usage", "usage",
+                            "/shop [category|search <words>|buy|sell|favorite|favorites|sort]");
+                } else {
+                    openShopItems(player, category, "", 0);
+                }
+                return true;
+            }
         }
-        String category = findCategory(args[0]);
-        if (category == null) {
-            send(player, "invalid-usage", "usage", "/shop [category|search <words>]");
-            return true;
-        }
-        openShopItems(player, category, "", 0);
-        return true;
     }
 
     private boolean handleSell(CommandSender sender, String[] args) {
@@ -173,26 +245,82 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
             send(player, "no-permission");
             return true;
         }
-        if (args.length != 1 || (!args[0].equalsIgnoreCase("hand") && !args[0].equalsIgnoreCase("all"))) {
-            send(player, "invalid-usage", "usage", "/sell <hand|all>");
+        if (args.length == 0) {
+            send(player, "invalid-usage", "usage",
+                    "/sell <hand [amount]|all|hotbar|category <name>|preview|confirm|cancel>");
             return true;
         }
-        if (args[0].equalsIgnoreCase("hand")) {
-            ItemStack hand = player.getInventory().getItemInMainHand();
-            String itemId = findShopItem(hand);
-            if (itemId == null) {
-                send(player, "unknown-item");
-            } else {
-                sellHeld(player, itemId, hand);
+        switch (args[0].toLowerCase(Locale.ROOT)) {
+            case "hand" -> {
+                if (args.length > 2) {
+                    send(player, "invalid-usage", "usage", "/sell hand [amount]");
+                    return true;
+                }
+                ItemStack hand = player.getInventory().getItemInMainHand();
+                String itemId = findShopItem(hand);
+                int amount = args.length == 2 ? parseAmount(args[1]) : hand.getAmount();
+                if (itemId == null) {
+                    send(player, "unknown-item");
+                } else if (amount < 1) {
+                    send(player, "invalid-number");
+                } else {
+                    sellHeld(player, itemId, hand, amount);
+                }
             }
-        } else {
-            int sold = 0;
-            for (String itemId : itemIds()) {
-                sold += sellMatching(player, itemId, Integer.MAX_VALUE);
+            case "all", "hotbar", "category" -> {
+                if (args[0].equalsIgnoreCase("category") && args.length != 2) {
+                    send(player, "invalid-usage", "usage", "/sell category <category>");
+                    return true;
+                }
+                if (args[0].equalsIgnoreCase("all") && args.length == 2
+                        && args[1].equalsIgnoreCase("confirm")) {
+                    confirmSell(player);
+                    return true;
+                }
+                if (args.length != 1 && !args[0].equalsIgnoreCase("category")) {
+                    send(player, "invalid-usage", "usage", "/sell all|hotbar|category <name>");
+                    return true;
+                }
+                String category = args[0].equalsIgnoreCase("category") ? findCategory(args[1]) : null;
+                if (args[0].equalsIgnoreCase("category") && category == null) {
+                    send(player, "admin-invalid-category");
+                    return true;
+                }
+                requestSellConfirmation(player, category, args[0].equalsIgnoreCase("hotbar"));
             }
-            if (sold == 0) {
-                send(player, "sell-empty");
+            case "preview" -> sendSellPreview(player);
+            case "confirm" -> confirmSell(player);
+            case "cancel" -> {
+                sellConfirmations.remove(player.getUniqueId());
+                send(player, "sell-cancelled");
             }
+            default -> {
+                send(player, "invalid-usage", "usage",
+                        "/sell <hand [amount]|all|hotbar|category <name>|preview|confirm|cancel>");
+            }
+        }
+        return true;
+    }
+
+    private boolean handleUtility(CommandSender sender, String kind) {
+        if (!(sender instanceof Player player)) {
+            send(sender, "player-only");
+            return true;
+        }
+        String permission = switch (kind) {
+            case "enderchest" -> "hamptashop.utility.enderchest";
+            case "crafting" -> "hamptashop.utility.crafting";
+            default -> "hamptashop.utility.anvil";
+        };
+        if (!player.hasPermission(permission)) {
+            send(player, "no-permission");
+            return true;
+        }
+        switch (kind) {
+            case "enderchest" -> player.openInventory(player.getEnderChest());
+            case "crafting" -> player.openWorkbench(player.getLocation(), true);
+            case "anvil" -> player.openAnvil(player.getLocation(), true);
+            default -> throw new IllegalStateException("Unknown utility menu: " + kind);
         }
         return true;
     }
@@ -207,18 +335,23 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
             return true;
         }
         if (args.length == 0) {
-            openAuction(player, 0);
+            openAuction(player, 0, "newest", "");
             return true;
         }
         switch (args[0].toLowerCase(Locale.ROOT)) {
             case "sell" -> {
-                if (args.length != 2) {
-                    send(player, "invalid-usage", "usage", "/ah sell <price>");
+                if (args.length < 2 || args.length > 3) {
+                    send(player, "invalid-usage", "usage", "/ah sell <price> [amount]");
                     return true;
                 }
-                createListing(player, args[1]);
+                int amount = args.length == 3 ? parseAmount(args[2]) : player.getInventory().getItemInMainHand().getAmount();
+                if (amount < 1) {
+                    send(player, "invalid-number");
+                    return true;
+                }
+                createListing(player, args[1], amount);
             }
-            case "mine" -> showOwnListings(player);
+            case "mine" -> openOwnListings(player, 0);
             case "cancel" -> {
                 if (args.length != 2) {
                     send(player, "invalid-usage", "usage", "/ah cancel <id>");
@@ -226,8 +359,35 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
                 }
                 cancelListing(player, args[1]);
             }
+            case "search" -> {
+                if (args.length < 2) {
+                    send(player, "ah-search-prompt");
+                } else {
+                    openAuction(player, 0, "newest", String.join(" ", Arrays.copyOfRange(args, 1, args.length)));
+                }
+            }
+            case "sort" -> {
+                if (args.length != 2 || !List.of("newest", "cheapest", "expensive", "ending")
+                        .contains(args[1].toLowerCase(Locale.ROOT))) {
+                    send(player, "invalid-usage", "usage", "/ah sort <newest|cheapest|expensive|ending>");
+                } else {
+                    openAuction(player, 0, args[1].toLowerCase(Locale.ROOT), "");
+                }
+            }
+            case "watch", "unwatch" -> {
+                if (args.length != 2) {
+                    send(player, "invalid-usage", "usage", "/ah watch|unwatch <player>");
+                    return true;
+                }
+                toggleWatchedSeller(player, args[1], args[0].equalsIgnoreCase("watch"));
+            }
+            case "stats" -> showAuctionStats(player);
+            case "info" -> showListingInfo(player, args.length == 2 ? args[1] : "");
+            case "refresh" -> openAuction(player, 0, "newest", "");
+            case "cancelall" -> cancelAllListings(player, args.length == 2 && args[1].equalsIgnoreCase("confirm"));
             case "claim" -> claimMailbox(player, false);
-            default -> send(player, "invalid-usage", "usage", "/ah [sell <price>|mine|cancel <id>|claim]");
+            default -> send(player, "invalid-usage", "usage",
+                    "/ah [search|sort|sell|mine|cancel|cancelall|watch|unwatch|stats|info|refresh|claim]");
         }
         return true;
     }
@@ -543,7 +703,13 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
     }
 
     private void openShopItems(Player player, String category, String query, int page) {
-        MenuHolder holder = new MenuHolder(MenuHolder.Kind.ITEMS, player.getUniqueId(), category, query, page);
+        openShopItems(player, category, query, page, "name", false);
+    }
+
+    private void openShopItems(Player player, String category, String query, int page, String sort,
+                               boolean favoritesOnly) {
+        MenuHolder holder = new MenuHolder(MenuHolder.Kind.ITEMS, player.getUniqueId(), category, query, page,
+                sort, favoritesOnly);
         Inventory inventory = Bukkit.createInventory(holder, 54, color("&8Shop &7- &f" +
                 (category == null ? "Search" : getConfig().getString("shop.categories." + category + ".name", category))));
         holder.inventory = inventory;
@@ -551,6 +717,8 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
                 .filter(id -> category == null || category.equalsIgnoreCase(
                         getConfig().getString("shop.items." + id + ".category", "")))
                 .filter(id -> matchesSearch(id, query))
+                .filter(id -> !favoritesOnly || isFavorite(player, id))
+                .sorted(shopComparator(sort, player))
                 .toList();
         int start = Math.max(0, page) * PAGE_SIZE;
         for (int i = start; i < Math.min(start + PAGE_SIZE, matching.size()); i++) {
@@ -574,6 +742,13 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
             inventory.setItem(i - start, display);
         }
         addNavigation(inventory, page, matching.size(), true);
+        inventory.setItem(46, namedItem(Material.NETHER_STAR,
+                favoritesOnly ? "&eViewing favorites" : "&eFavorites",
+                List.of("&7Click to toggle your favorite items.")));
+        inventory.setItem(47, namedItem(Material.HOPPER, "&eSort: " + sortLabel(sort),
+                List.of("&7Click to change item sorting.")));
+        inventory.setItem(51, namedItem(Material.BOOK, "&eCategories",
+                List.of("&7Return to the category menu.")));
         if (matching.isEmpty()) {
             inventory.setItem(22, namedItem(Material.BARRIER, "&cNo items found",
                     List.of("&7Try a different search or category.")));
@@ -581,13 +756,14 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
         player.openInventory(inventory);
     }
 
-    private void openAuction(Player player, int page) {
-        MenuHolder holder = new MenuHolder(MenuHolder.Kind.AUCTION, player.getUniqueId(), null, "", page);
+    private void openAuction(Player player, int page, String sort, String query) {
+        MenuHolder holder = new MenuHolder(MenuHolder.Kind.AUCTION, player.getUniqueId(), null, query, page, sort, false);
         Inventory inventory = Bukkit.createInventory(holder, 54,
                 color(getConfig().getString("settings.auction-title", "&8Auction House")));
         holder.inventory = inventory;
         try {
-            List<AuctionListing> listings = auctionDatabase.listActive(PAGE_SIZE, page * PAGE_SIZE);
+            List<AuctionListing> listings = auctionDatabase.listActive(PAGE_SIZE, page * PAGE_SIZE, sort, query);
+            int totalListings = auctionDatabase.countActive(query);
             for (int i = 0; i < listings.size(); i++) {
                 AuctionListing listing = listings.get(i);
                 ItemStack display = listing.item().clone();
@@ -605,10 +781,20 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
                 inventory.setItem(i, display);
                 holder.listingsBySlot.put(i, listing.id());
             }
-            addNavigation(inventory, page, listings.size() == PAGE_SIZE ? (page + 1) * PAGE_SIZE + 1 : page * PAGE_SIZE + listings.size(), false);
+            addNavigation(inventory, page, totalListings, false);
+            inventory.setItem(46, namedItem(Material.HOPPER, "&eSort: " + auctionSortLabel(sort),
+                    List.of("&7Use &f/ah sort <newest|cheapest|expensive|ending>")));
+            inventory.setItem(47, namedItem(Material.COMPASS, "&bSearch listings",
+                    List.of("&7Use &f/ah search <words>")));
             inventory.setItem(49, namedItem(Material.PAPER, "&bAuction House",
-                    List.of("&7Sell an item with &f/ah sell <price>",
+                    List.of("&7Sell with &f/ah sell <price> [amount]",
                             "&7Manage listings with &f/ah mine")));
+            inventory.setItem(51, namedItem(Material.BOOK, "&e" + totalListings + " active listings",
+                    List.of("&7Use &f/ah stats &7for your totals.")));
+            if (listings.isEmpty()) {
+                inventory.setItem(22, namedItem(Material.BARRIER, "&cNo listings found",
+                        List.of("&7Try a different search or sort.")));
+            }
         } catch (SQLException exception) {
             getLogger().log(Level.SEVERE, "Could not load auction listings.", exception);
             send(player, "economy-error");
@@ -644,7 +830,9 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
         if (slot == 45) {
             if (holder.page > 0 && holder.kind != MenuHolder.Kind.CATEGORIES) {
                 if (holder.kind == MenuHolder.Kind.AUCTION) {
-                    openAuction(player, holder.page - 1);
+                    openAuction(player, holder.page - 1, holder.sort, holder.query);
+                } else if (holder.kind == MenuHolder.Kind.AUCTION_MINE) {
+                    openOwnListings(player, holder.page - 1);
                 } else {
                     openShopItems(player, holder.category, holder.query, holder.page - 1);
                 }
@@ -653,7 +841,9 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
         }
         if (slot == 53 && holder.kind != MenuHolder.Kind.CATEGORIES) {
             if (holder.kind == MenuHolder.Kind.AUCTION) {
-                openAuction(player, holder.page + 1);
+                openAuction(player, holder.page + 1, holder.sort, holder.query);
+            } else if (holder.kind == MenuHolder.Kind.AUCTION_MINE) {
+                openOwnListings(player, holder.page + 1);
             } else {
                 openShopItems(player, holder.category, holder.query, holder.page + 1);
             }
@@ -667,18 +857,53 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
         } else if (holder.kind == MenuHolder.Kind.ITEMS && slot >= 0 && slot < PAGE_SIZE) {
             String itemId = itemAtSlot(holder, slot);
             if (itemId != null) {
-                if (event.isLeftClick()) {
+                if (event.isMiddleClick()) {
+                    toggleFavorite(player, itemId);
+                } else if (event.isLeftClick()) {
                     buyFromShop(player, itemId, event.isShiftClick() ? 16 : 1);
                 } else if (event.isRightClick()) {
                     sellMatching(player, itemId, event.isShiftClick() ? Integer.MAX_VALUE : 1);
                 }
-                openShopItems(player, holder.category, holder.query, holder.page);
+                openShopItems(player, holder.category, holder.query, holder.page, holder.sort, holder.favoritesOnly);
             }
+        } else if (holder.kind == MenuHolder.Kind.ITEMS && slot == 46) {
+            openShopItems(player, holder.category, holder.query, 0, holder.sort, !holder.favoritesOnly);
+        } else if (holder.kind == MenuHolder.Kind.ITEMS && slot == 47) {
+            String nextSort = switch (holder.sort) {
+                case "name" -> "buy";
+                case "buy" -> "sell";
+                default -> "name";
+            };
+            openShopItems(player, holder.category, holder.query, 0, nextSort, holder.favoritesOnly);
+        } else if (holder.kind == MenuHolder.Kind.ITEMS && slot == 51) {
+            openCategories(player);
         } else if (holder.kind == MenuHolder.Kind.AUCTION) {
             Long listingId = holder.listingsBySlot.get(slot);
             if (listingId != null) {
-                buyListing(player, listingId);
-                openAuction(player, holder.page);
+                AuctionBuyConfirmation pending = auctionBuyConfirmations.get(player.getUniqueId());
+                if (pending == null || pending.listingId() != listingId
+                        || pending.expiresAt() < System.currentTimeMillis()) {
+                    auctionBuyConfirmations.put(player.getUniqueId(),
+                            new AuctionBuyConfirmation(listingId, System.currentTimeMillis() + 8_000L));
+                    try {
+                        AuctionListing listing = auctionDatabase.get(listingId);
+                        if (listing != null) {
+                            send(player, "ah-confirm-buy", "price", formatCurrency(listing.price()));
+                        }
+                    } catch (SQLException exception) {
+                        getLogger().log(Level.SEVERE, "Could not read auction listing #" + listingId, exception);
+                        send(player, "economy-error");
+                    }
+                } else {
+                    auctionBuyConfirmations.remove(player.getUniqueId());
+                    buyListing(player, listingId);
+                }
+            }
+        } else if (holder.kind == MenuHolder.Kind.AUCTION_MINE) {
+            Long listingId = holder.listingsBySlot.get(slot);
+            if (listingId != null) {
+                cancelListing(player, Long.toString(listingId));
+                openOwnListings(player, holder.page);
             }
         }
     }
@@ -703,7 +928,7 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
             return;
         }
         ItemStack product = shopItem(id);
-        int amount = Math.min(requestedAmount, product.getMaxStackSize());
+        int amount = requestedAmount;
         double total = unitPrice * amount;
         if (!Double.isFinite(total) || total <= 0 || !canFit(player.getInventory(), product, amount)) {
             send(player, "inventory-full");
@@ -714,9 +939,7 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
             send(player, "insufficient-funds");
             return;
         }
-        ItemStack purchased = product.clone();
-        purchased.setAmount(amount);
-        Map<Integer, ItemStack> remainder = player.getInventory().addItem(purchased);
+        Map<Integer, ItemStack> remainder = addItems(player.getInventory(), product, amount);
         if (!remainder.isEmpty()) {
             EconomyResponse refund = economy.depositPlayer(player, total);
             if (!refund.transactionSuccess()) {
@@ -752,18 +975,24 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
         return amount;
     }
 
-    private void sellHeld(Player player, String id, ItemStack held) {
+    private void sellHeld(Player player, String id, ItemStack held, int requestedAmount) {
         double unitPrice = sellPrice(id, player);
-        double total = unitPrice * held.getAmount();
+        int amount = Math.min(held.getAmount(), requestedAmount);
+        double total = unitPrice * amount;
         if (unitPrice <= 0 || !Double.isFinite(total) || total <= 0) {
             send(player, "unknown-item");
             return;
         }
         ItemStack sold = held.clone();
-        player.getInventory().setItemInMainHand(null);
+        sold.setAmount(amount);
+        if (held.getAmount() == amount) {
+            player.getInventory().setItemInMainHand(null);
+        } else {
+            held.setAmount(held.getAmount() - amount);
+        }
         EconomyResponse response = economy.depositPlayer(player, total);
         if (!response.transactionSuccess()) {
-            giveOrDrop(player, sold);
+            player.getInventory().addItem(sold);
             send(player, "economy-error");
             return;
         }
@@ -771,7 +1000,7 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
                 "item", displayName(sold), "price", formatCurrency(total));
     }
 
-    private boolean createListing(Player player, String rawPrice) {
+    private boolean createListing(Player player, String rawPrice, int requestedAmount) {
         double price = parsePositive(rawPrice);
         double min = getConfig().getDouble("auction.minimum-price", 0.01);
         double max = getConfig().getDouble("auction.maximum-price", 1_000_000_000.0);
@@ -782,6 +1011,10 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
         ItemStack hand = player.getInventory().getItemInMainHand();
         if (hand.getType().isAir()) {
             send(player, "admin-held-item");
+            return true;
+        }
+        if (requestedAmount > hand.getAmount()) {
+            send(player, "invalid-number");
             return true;
         }
         try {
@@ -796,13 +1029,19 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
                 return true;
             }
             ItemStack listingItem = hand.clone();
+            listingItem.setAmount(requestedAmount);
             long days = Math.max(1, getConfig().getLong("auction.expiry-days", 7));
             long expiresAt = System.currentTimeMillis() + days * 86_400_000L;
             try {
                 long id = auctionDatabase.create(player.getUniqueId(), player.getName(), listingItem, price, expiresAt);
-                player.getInventory().setItemInMainHand(null);
+                if (requestedAmount == hand.getAmount()) {
+                    player.getInventory().setItemInMainHand(null);
+                } else {
+                    hand.setAmount(hand.getAmount() - requestedAmount);
+                }
                 send(player, "ah-listed", "item", displayName(listingItem),
                         "price", formatCurrency(price), "id", Long.toString(id));
+                notifyWatchers(player, listingItem, price, id);
             } catch (SQLException exception) {
                 if (fee > 0) {
                     EconomyResponse refund = economy.depositPlayer(player, fee);
@@ -920,21 +1159,130 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
         }
     }
 
-    private void showOwnListings(Player player) {
+    private void openOwnListings(Player player, int page) {
         try {
             List<AuctionListing> listings = auctionDatabase.listBySeller(player.getUniqueId());
             if (listings.isEmpty()) {
-                player.sendMessage(prefix() + color("&7You have no active listings. Create one with &f/ah sell <price>"));
+                send(player, "ah-mine-empty");
                 return;
             }
-            player.sendMessage(prefix() + color("&bYour active listings:"));
-            for (AuctionListing listing : listings) {
-                player.sendMessage(color("&8#&f" + listing.id() + " &7- " + displayName(listing.item())
-                        + " &7for &a" + formatCurrency(listing.price()) + " &8| &7Cancel: &f/ah cancel "
-                        + listing.id()));
+            MenuHolder holder = new MenuHolder(MenuHolder.Kind.AUCTION_MINE, player.getUniqueId(), null, "", page);
+            Inventory inventory = Bukkit.createInventory(holder, 54, color("&8Your Auctions"));
+            holder.inventory = inventory;
+            int start = Math.max(0, page) * PAGE_SIZE;
+            for (int i = start; i < Math.min(start + PAGE_SIZE, listings.size()); i++) {
+                AuctionListing listing = listings.get(i);
+                ItemStack display = listing.item().clone();
+                ItemMeta meta = display.getItemMeta();
+                if (meta != null) {
+                    List<String> lore = meta.hasLore() ? new ArrayList<>(meta.getLore()) : new ArrayList<>();
+                    lore.add("");
+                    lore.add(color("&7Price: &a" + formatCurrency(listing.price())));
+                    lore.add(color("&7Expires: &f" + remainingTime(listing.expiresAt())));
+                    lore.add(color("&cClick to cancel and return this item."));
+                    lore.add(color("&8Listing #" + listing.id()));
+                    meta.setLore(lore);
+                    display.setItemMeta(meta);
+                }
+                inventory.setItem(i - start, display);
+                holder.listingsBySlot.put(i - start, listing.id());
             }
+            addNavigation(inventory, page, listings.size(), false);
+            inventory.setItem(49, namedItem(Material.PAPER, "&bYour active listings",
+                    List.of("&7Click a listing to cancel it.")));
+            player.openInventory(inventory);
         } catch (SQLException exception) {
             getLogger().log(Level.SEVERE, "Could not load the player's auction listings.", exception);
+            send(player, "economy-error");
+        }
+    }
+
+    private String auctionSortLabel(String sort) {
+        return switch (sort) {
+            case "cheapest" -> "Lowest price";
+            case "expensive" -> "Highest price";
+            case "ending" -> "Ending soon";
+            default -> "Newest";
+        };
+    }
+
+    private void toggleWatchedSeller(Player player, String seller, boolean watch) {
+        String path = "players." + player.getUniqueId() + ".watched-sellers";
+        List<String> watched = new ArrayList<>(playerData.getStringList(path));
+        boolean changed = watch ? !watched.contains(seller) && watched.add(seller) : watched.removeIf(
+                name -> name.equalsIgnoreCase(seller));
+        if (changed) {
+            playerData.set(path, watched);
+            savePlayerData();
+        }
+        send(player, watch ? "ah-watch-added" : "ah-watch-removed", "seller", seller);
+    }
+
+    private void notifyWatchers(Player seller, ItemStack item, double price, long listingId) {
+        for (Player online : Bukkit.getOnlinePlayers()) {
+            if (online.getUniqueId().equals(seller.getUniqueId())) {
+                continue;
+            }
+            boolean watching = playerData.getStringList("players." + online.getUniqueId() + ".watched-sellers")
+                    .stream().anyMatch(name -> name.equalsIgnoreCase(seller.getName()));
+            if (watching) {
+                send(online, "ah-watched-listing", "seller", seller.getName(),
+                        "item", displayName(item), "price", formatCurrency(price), "id", Long.toString(listingId));
+            }
+        }
+    }
+
+    private void showAuctionStats(Player player) {
+        try {
+            int active = auctionDatabase.countActive("");
+            int mine = auctionDatabase.countBySeller(player.getUniqueId());
+            send(player, "ah-stats", "active", Integer.toString(active), "mine", Integer.toString(mine));
+        } catch (SQLException exception) {
+            getLogger().log(Level.SEVERE, "Could not load auction statistics.", exception);
+            send(player, "economy-error");
+        }
+    }
+
+    private void showListingInfo(Player player, String rawId) {
+        long id;
+        try {
+            id = Long.parseLong(rawId);
+        } catch (NumberFormatException exception) {
+            send(player, "invalid-usage", "usage", "/ah info <listing-id>");
+            return;
+        }
+        try {
+            AuctionListing listing = auctionDatabase.get(id);
+            if (listing == null) {
+                send(player, "ah-not-found");
+                return;
+            }
+            send(player, "ah-listing-info", "id", Long.toString(id), "seller", listing.sellerName(),
+                    "item", displayName(listing.item()), "price", formatCurrency(listing.price()),
+                    "expires", remainingTime(listing.expiresAt()));
+        } catch (SQLException exception) {
+            getLogger().log(Level.SEVERE, "Could not load auction listing details.", exception);
+            send(player, "economy-error");
+        }
+    }
+
+    private void cancelAllListings(Player player, boolean confirmed) {
+        if (!confirmed) {
+            send(player, "invalid-usage", "usage", "/ah cancelall confirm");
+            return;
+        }
+        try {
+            List<AuctionListing> listings = auctionDatabase.listBySeller(player.getUniqueId());
+            int cancelled = 0;
+            for (AuctionListing listing : listings) {
+                if (auctionDatabase.delete(listing.id(), player.getUniqueId())) {
+                    giveOrDrop(player, listing.item());
+                    cancelled++;
+                }
+            }
+            send(player, "ah-cancelall", "amount", Integer.toString(cancelled));
+        } catch (SQLException exception) {
+            getLogger().log(Level.SEVERE, "Could not cancel all auction listings.", exception);
             send(player, "economy-error");
         }
     }
@@ -982,7 +1330,7 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
         int remaining = amount;
         for (ItemStack existing : inventory.getStorageContents()) {
             if (existing == null || existing.getType().isAir()) {
-                remaining -= item.getMaxStackSize();
+                remaining -= Math.min(item.getMaxStackSize(), remaining);
             } else if (existing.isSimilar(item)) {
                 remaining -= Math.max(0, existing.getMaxStackSize() - existing.getAmount());
             }
@@ -993,10 +1341,31 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
         return remaining <= 0;
     }
 
+    private Map<Integer, ItemStack> addItems(PlayerInventory inventory, ItemStack prototype, int requestedAmount) {
+        Map<Integer, ItemStack> overflow = new HashMap<>();
+        int remaining = requestedAmount;
+        while (remaining > 0) {
+            int amount = Math.min(remaining, prototype.getMaxStackSize());
+            ItemStack stack = prototype.clone();
+            stack.setAmount(amount);
+            Map<Integer, ItemStack> part = inventory.addItem(stack);
+            if (!part.isEmpty()) {
+                overflow.putAll(part);
+                break;
+            }
+            remaining -= amount;
+        }
+        return overflow;
+    }
+
     private List<ItemStack> removeMatching(PlayerInventory inventory, String itemId, int requested) {
+        return removeMatching(inventory, itemId, requested, inventory.getStorageContents().length);
+    }
+
+    private List<ItemStack> removeMatching(PlayerInventory inventory, String itemId, int requested, int slots) {
         List<ItemStack> removed = new ArrayList<>();
         int remaining = requested;
-        for (int slot = 0; slot < inventory.getStorageContents().length && remaining > 0; slot++) {
+        for (int slot = 0; slot < Math.min(slots, inventory.getStorageContents().length) && remaining > 0; slot++) {
             ItemStack current = inventory.getItem(slot);
             if (current == null || !matchesShopItem(itemId, current)) {
                 continue;
@@ -1026,6 +1395,8 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
                 .filter(id -> holder.category == null || holder.category.equalsIgnoreCase(
                         getConfig().getString("shop.items." + id + ".category", "")))
                 .filter(id -> matchesSearch(id, holder.query))
+                .filter(id -> !holder.favoritesOnly || isFavorite(Bukkit.getPlayer(holder.owner), id))
+                .sorted(shopComparator(holder.sort, Bukkit.getPlayer(holder.owner)))
                 .toList();
         int index = holder.page * PAGE_SIZE + slot;
         return index >= 0 && index < matching.size() ? matching.get(index) : null;
@@ -1050,6 +1421,178 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
             return Collections.emptyList();
         }
         return section.getKeys(false).stream().sorted().toList();
+    }
+
+    private java.util.Comparator<String> shopComparator(String sort, Player player) {
+        return switch (sort) {
+            case "buy" -> java.util.Comparator.comparingDouble(id -> player == null ? 0 : buyPrice(id, player));
+            case "sell" -> java.util.Comparator.comparingDouble(id ->
+                    player == null ? 0 : sellPrice(id, player)).reversed();
+            default -> java.util.Comparator.comparing(id ->
+                    ChatColor.stripColor(color(getConfig().getString("shop.items." + id + ".name", prettify(id))))
+                            .toLowerCase(Locale.ROOT));
+        };
+    }
+
+    private String sortLabel(String sort) {
+        return switch (sort) {
+            case "buy" -> "Lowest buy price";
+            case "sell" -> "Highest sell price";
+            default -> "Name";
+        };
+    }
+
+    private boolean isFavorite(Player player, String itemId) {
+        return player != null && playerData.getStringList("players." + player.getUniqueId() + ".favorites")
+                .contains(itemId);
+    }
+
+    private void toggleFavorite(Player player, String itemId) {
+        String path = "players." + player.getUniqueId() + ".favorites";
+        List<String> favorites = new ArrayList<>(playerData.getStringList(path));
+        if (favorites.remove(itemId)) {
+            playerData.set(path, favorites);
+            send(player, "shop-favorite-removed", "item", itemId);
+        } else {
+            favorites.add(itemId);
+            playerData.set(path, favorites);
+            send(player, "shop-favorite-added", "item", itemId);
+        }
+        savePlayerData();
+    }
+
+    private void savePlayerData() {
+        try {
+            playerData.save(playerDataFile);
+        } catch (IOException exception) {
+            getLogger().log(Level.SEVERE, "Could not save player shop preferences.", exception);
+        }
+    }
+
+    private String findItemId(String value) {
+        ConfigurationSection section = getConfig().getConfigurationSection("shop.items");
+        if (section == null) {
+            return null;
+        }
+        return section.getKeys(false).stream().filter(id -> id.equalsIgnoreCase(value)).findFirst().orElse(null);
+    }
+
+    private int parseAmount(String value) {
+        try {
+            return Integer.parseInt(value);
+        } catch (NumberFormatException exception) {
+            return -1;
+        }
+    }
+
+    private int sellMatching(Player player, String id, int requestedAmount, int slots) {
+        double unitPrice = sellPrice(id, player);
+        if (unitPrice <= 0) {
+            return 0;
+        }
+        ItemStack prototype = shopItem(id);
+        List<ItemStack> removed = removeMatching(player.getInventory(), id, requestedAmount, slots);
+        int amount = removed.stream().mapToInt(ItemStack::getAmount).sum();
+        if (amount == 0) {
+            return 0;
+        }
+        double total = unitPrice * amount;
+        if (!Double.isFinite(total) || total <= 0) {
+            restoreItems(player, removed);
+            send(player, "invalid-number");
+            return 0;
+        }
+        EconomyResponse response = economy.depositPlayer(player, total);
+        if (!response.transactionSuccess()) {
+            restoreItems(player, removed);
+            send(player, "economy-error");
+            return 0;
+        }
+        send(player, "shop-sold", "amount", Integer.toString(amount),
+                "item", displayName(prototype), "price", formatCurrency(total));
+        return amount;
+    }
+
+    private Map<String, Integer> sellableCounts(Player player, String category) {
+        Map<String, Integer> counts = new HashMap<>();
+        ItemStack[] contents = player.getInventory().getStorageContents();
+        for (String id : itemIds()) {
+            if (category != null && !category.equalsIgnoreCase(
+                    getConfig().getString("shop.items." + id + ".category", ""))) {
+                continue;
+            }
+            int amount = 0;
+            for (ItemStack stack : contents) {
+                if (stack != null && matchesShopItem(id, stack)) {
+                    amount += stack.getAmount();
+                }
+            }
+            if (amount > 0 && sellPrice(id, player) > 0) {
+                counts.put(id, amount);
+            }
+        }
+        return counts;
+    }
+
+    private double sellableValue(Player player, Map<String, Integer> counts) {
+        return counts.entrySet().stream()
+                .mapToDouble(entry -> sellPrice(entry.getKey(), player) * entry.getValue()).sum();
+    }
+
+    private void requestSellConfirmation(Player player, String category, boolean hotbarOnly) {
+        Map<String, Integer> counts = sellableCounts(player, category);
+        if (hotbarOnly) {
+            Map<String, Integer> hotbarCounts = new HashMap<>();
+            for (String id : counts.keySet()) {
+                int amount = 0;
+                for (int slot = 0; slot < 9; slot++) {
+                    ItemStack stack = player.getInventory().getItem(slot);
+                    if (stack != null && matchesShopItem(id, stack)) {
+                        amount += stack.getAmount();
+                    }
+                }
+                if (amount > 0) {
+                    hotbarCounts.put(id, amount);
+                }
+            }
+            counts = hotbarCounts;
+        }
+        if (counts.isEmpty()) {
+            send(player, "sell-empty");
+            return;
+        }
+        sellConfirmations.put(player.getUniqueId(),
+                new SellConfirmation(Map.copyOf(counts), hotbarOnly, System.currentTimeMillis() + 30_000L));
+        send(player, "sell-confirm-prompt", "amount", Integer.toString(counts.values().stream()
+                        .mapToInt(Integer::intValue).sum()),
+                "total", formatCurrency(sellableValue(player, counts)));
+    }
+
+    private void sendSellPreview(Player player) {
+        Map<String, Integer> counts = sellableCounts(player, null);
+        if (counts.isEmpty()) {
+            send(player, "sell-empty");
+            return;
+        }
+        send(player, "sell-preview", "amount", Integer.toString(counts.values().stream()
+                        .mapToInt(Integer::intValue).sum()),
+                "total", formatCurrency(sellableValue(player, counts)));
+    }
+
+    private void confirmSell(Player player) {
+        SellConfirmation confirmation = sellConfirmations.remove(player.getUniqueId());
+        if (confirmation == null || confirmation.expiresAt() < System.currentTimeMillis()) {
+            send(player, "sell-confirm-expired");
+            return;
+        }
+        int sold = 0;
+        for (Map.Entry<String, Integer> entry : confirmation.amounts().entrySet()) {
+            int slots = confirmation.hotbarOnly() ? 9 : player.getInventory().getStorageContents().length;
+            sold += sellMatching(player, entry.getKey(), entry.getValue(), slots);
+        }
+        if (sold == 0) {
+            send(player, "sell-empty");
+        }
     }
 
     private ItemStack shopItem(String id) {
@@ -1262,9 +1805,22 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
             }
             choices.add("search");
         } else if (command.getName().equalsIgnoreCase("sell") && args.length == 1) {
-            choices.addAll(List.of("hand", "all"));
+            choices.addAll(List.of("hand", "all", "hotbar", "category", "preview", "confirm", "cancel"));
         } else if (command.getName().equalsIgnoreCase("ah") && args.length == 1) {
-            choices.addAll(List.of("sell", "mine", "cancel", "claim"));
+            choices.addAll(List.of("sell", "mine", "cancel", "cancelall", "search", "sort",
+                    "watch", "unwatch", "stats", "info", "refresh", "claim"));
+        } else if (command.getName().equalsIgnoreCase("ah") && args.length == 2
+                && (args[0].equalsIgnoreCase("watch") || args[0].equalsIgnoreCase("unwatch"))) {
+            choices.addAll(Bukkit.getOnlinePlayers().stream().map(Player::getName).toList());
+        } else if (command.getName().equalsIgnoreCase("ah") && args.length == 2
+                && args[0].equalsIgnoreCase("cancelall")) {
+            choices.add("confirm");
+        } else if (command.getName().equalsIgnoreCase("ah") && args.length == 2
+                && args[0].equalsIgnoreCase("sort")) {
+            choices.addAll(List.of("newest", "cheapest", "expensive", "ending"));
+        } else if (command.getName().equalsIgnoreCase("shop") && args.length == 2
+                && args[0].equalsIgnoreCase("sort")) {
+            choices.addAll(List.of("name", "buy", "sell"));
         } else if (command.getName().equalsIgnoreCase("hamptashop")) {
             if (args.length == 1) {
                 choices.addAll(List.of("reload", "preset", "admin"));
