@@ -1,0 +1,26 @@
+category:
+  name: "&6Food"
+  material: BREAD
+  slot: 19
+
+items:
+  bread:
+    material: BREAD
+    name: "&6Bread"
+    buy-price: 8.0
+    sell-price: 2.0
+  cooked_beef:
+    material: COOKED_BEEF
+    name: "&6Steak"
+    buy-price: 14.0
+    sell-price: 3.5
+  baked_potato:
+    material: BAKED_POTATO
+    name: "&eBaked Potato"
+    buy-price: 6.0
+    sell-price: 1.5
+  golden_carrot:
+    material: GOLDEN_CARROT
+    name: "&6Golden Carrot"
+    buy-price: 24.0
+    sell-price: 6.0

@@ -1,0 +1,31 @@
+category:
+  name: "&2Mob drops"
+  material: ROTTEN_FLESH
+  slot: 21
+
+items:
+  rotten_flesh:
+    material: ROTTEN_FLESH
+    name: "&cRotten Flesh"
+    buy-price: 4.0
+    sell-price: 1.0
+  bone:
+    material: BONE
+    name: "&fBone"
+    buy-price: 6.0
+    sell-price: 1.5
+  string:
+    material: STRING
+    name: "&fString"
+    buy-price: 8.0
+    sell-price: 2.0
+  gunpowder:
+    material: GUNPOWDER
+    name: "&7Gunpowder"
+    buy-price: 18.0
+    sell-price: 4.5
+  blaze_rod:
+    material: BLAZE_ROD
+    name: "&6Blaze Rod"
+    buy-price: 30.0
+    sell-price: 7.5

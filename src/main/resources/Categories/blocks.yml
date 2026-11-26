@@ -1,0 +1,31 @@
+category:
+  name: "&aBlocks"
+  material: BRICKS
+  slot: 10
+
+items:
+  oak_planks:
+    material: OAK_PLANKS
+    name: "&fOak Planks"
+    buy-price: 4.0
+    sell-price: 1.0
+  stone:
+    material: STONE
+    name: "&7Stone"
+    buy-price: 3.0
+    sell-price: 0.75
+  glass:
+    material: GLASS
+    name: "&fGlass"
+    buy-price: 8.0
+    sell-price: 2.0
+  sand:
+    material: SAND
+    name: "&eSand"
+    buy-price: 5.0
+    sell-price: 1.25
+  obsidian:
+    material: OBSIDIAN
+    name: "&5Obsidian"
+    buy-price: 40.0
+    sell-price: 10.0

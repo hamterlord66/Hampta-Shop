@@ -55,6 +55,7 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
     private YamlConfiguration messages;
     private YamlConfiguration presets;
     private File presetsFile;
+    private ShopCatalog shopCatalog;
     private YamlConfiguration playerData;
     private File playerDataFile;
     private final Map<UUID, SellConfirmation> sellConfirmations = new HashMap<>();
@@ -73,7 +74,18 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
         messages = YamlConfiguration.loadConfiguration(new java.io.File(getDataFolder(), "messages.yml"));
         presetsFile = new File(getDataFolder(), "presets.yml");
         presets = YamlConfiguration.loadConfiguration(presetsFile);
-        migrateShopCatalog();
+        shopCatalog = new ShopCatalog(this, new File(getDataFolder(), "Categories"));
+        if (!migrateShopCatalog()) {
+            getServer().getPluginManager().disablePlugin(this);
+            return;
+        }
+        try {
+            shopCatalog.initialize(getConfig());
+        } catch (IOException exception) {
+            getLogger().log(Level.SEVERE, "Could not load the Categories folder.", exception);
+            getServer().getPluginManager().disablePlugin(this);
+            return;
+        }
         playerDataFile = new File(getDataFolder(), "players.yml");
         playerData = YamlConfiguration.loadConfiguration(playerDataFile);
         setupEconomy();
@@ -135,53 +147,30 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
         economy = registration.getProvider();
     }
 
-    private void migrateShopCatalog() {
-        if (getConfig().getInt("shop.catalog-version", 0) >= 2) {
-            return;
+    private boolean migrateShopCatalog() {
+        boolean legacyCatalog = getConfig().isConfigurationSection("shop.categories")
+                || getConfig().isConfigurationSection("shop.items");
+        boolean updatePresets = !presets.getString("catalogs.standard.source", "").equalsIgnoreCase("defaults");
+        if (!legacyCatalog && !updatePresets) {
+            return true;
         }
         File backupFolder = new File(getDataFolder(), "backups");
         if (!backupFolder.exists() && !backupFolder.mkdirs()) {
-            getLogger().severe("Could not create a backup directory; shop catalog migration was skipped.");
-            return;
+            getLogger().severe("Could not create a backup directory; catalog migration was skipped.");
+            return false;
         }
         String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss-SSS"));
-        File configBackup = new File(backupFolder, "config-before-catalog-v2-" + timestamp + ".yml");
-        File presetBackup = new File(backupFolder, "presets-before-catalog-v2-" + timestamp + ".yml");
         try {
-            getConfig().save(configBackup);
-            presets.save(presetBackup);
-        } catch (IOException exception) {
-            getLogger().log(Level.SEVERE, "Could not back up shop settings; catalog migration was skipped.", exception);
-            return;
-        }
-        try (var stream = getResource("config.yml")) {
-            if (stream == null) {
-                throw new IOException("Bundled default config.yml was not found.");
+            getConfig().save(new File(backupFolder, "config-before-category-files-" + timestamp + ".yml"));
+            presets.save(new File(backupFolder, "presets-before-category-files-" + timestamp + ".yml"));
+            shopCatalog.backupTo(new File(backupFolder, "Categories-before-category-files-" + timestamp));
+            if (updatePresets) {
+                migrateBuiltInPresets();
             }
-            YamlConfiguration defaults = YamlConfiguration.loadConfiguration(
-                    new java.io.InputStreamReader(stream, java.nio.charset.StandardCharsets.UTF_8));
-            replaceConfigSection(defaults, "shop.categories");
-            replaceConfigSection(defaults, "shop.items");
-            getConfig().set("shop.catalog-version", 2);
-            saveConfig();
-            migrateBuiltInPresets();
-            getLogger().info("Migrated the server shop to catalog version 2. Previous settings were backed up to "
-                    + backupFolder.getName() + ".");
+            return true;
         } catch (IOException exception) {
-            getLogger().log(Level.SEVERE, "Could not migrate the shop catalog.", exception);
-        }
-    }
-
-    private void replaceConfigSection(YamlConfiguration source, String path) {
-        ConfigurationSection section = source.getConfigurationSection(path);
-        if (section == null) {
-            throw new IllegalStateException("Bundled default catalog is missing " + path);
-        }
-        getConfig().set(path, null);
-        for (Map.Entry<String, Object> entry : section.getValues(true).entrySet()) {
-            if (!(entry.getValue() instanceof ConfigurationSection)) {
-                getConfig().set(path + "." + entry.getKey(), entry.getValue());
-            }
+            getLogger().log(Level.SEVERE, "Could not safely back up or migrate the catalog files.", exception);
+            return false;
         }
     }
 
@@ -500,6 +489,13 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
             reloadConfig();
             messages = YamlConfiguration.loadConfiguration(new java.io.File(getDataFolder(), "messages.yml"));
             presets = YamlConfiguration.loadConfiguration(presetsFile);
+            try {
+                shopCatalog.reload();
+            } catch (IOException exception) {
+                getLogger().log(Level.SEVERE, "Could not reload category files.", exception);
+                send(sender, "preset-save-error");
+                return true;
+            }
             send(sender, "admin-reloaded");
             return true;
         }
@@ -611,7 +607,9 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
 
     private void saveCurrentPreset(CommandSender sender, String id) {
         try {
-            copyConfigSectionToPresets("shop", "custom-presets." + id + ".shop");
+            presets.set("custom-presets." + id, null);
+            copyCatalogSectionToPresets("shop.categories", "custom-presets." + id + ".shop.categories");
+            copyCatalogSectionToPresets("shop.items", "custom-presets." + id + ".shop.items");
             copyConfigSectionToPresets("auction", "custom-presets." + id + ".auction");
             presets.save(presetsFile);
             send(sender, "preset-saved", "preset", id);
@@ -623,6 +621,18 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
 
     private void copyConfigSectionToPresets(String source, String target) {
         ConfigurationSection section = getConfig().getConfigurationSection(source);
+        if (section == null) {
+            return;
+        }
+        for (Map.Entry<String, Object> entry : section.getValues(true).entrySet()) {
+            if (!(entry.getValue() instanceof ConfigurationSection)) {
+                presets.set(target + "." + entry.getKey(), entry.getValue());
+            }
+        }
+    }
+
+    private void copyCatalogSectionToPresets(String source, String target) {
+        ConfigurationSection section = shopCatalog.configuration().getConfigurationSection(source);
         if (section == null) {
             return;
         }
@@ -649,15 +659,43 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
             send(sender, "preset-backup-error");
             return;
         }
-        ConfigurationSection shop = resolvePresetShop(preset);
-        copyPresetSection(shop, "categories", "shop.categories");
-        copyPresetSection(shop, "items", "shop.items");
-        applyPresetPriceMultipliers(preset);
-        copyPresetSection(preset, "auction");
-        saveConfig();
-        reloadConfig();
-        send(sender, "preset-applied", "preset", id, "backup", backup.getName());
-        getLogger().info(sender.getName() + " applied preset '" + id + "'. Backup: " + backup.getName());
+        File catalogBackup = new File(backupFolder, "Categories-" + timestamp);
+        boolean catalogBackedUp = false;
+        try {
+            shopCatalog.backupTo(catalogBackup);
+            catalogBackedUp = true;
+            ConfigurationSection shop = resolvePresetShop(preset);
+            shopCatalog.replaceFrom(shop);
+            applyPresetPriceMultipliers(preset);
+            saveShopCatalog();
+            copyPresetSection(preset, "auction");
+            saveConfig();
+            reloadConfig();
+            send(sender, "preset-applied", "preset", id, "backup", backup.getName());
+            getLogger().info(sender.getName() + " applied preset '" + id + "'. Backup: " + backup.getName());
+        } catch (IOException | IllegalArgumentException exception) {
+            getLogger().log(Level.SEVERE, "Could not apply preset '" + id + "'. Catalog backup: "
+                    + catalogBackup.getName(), exception);
+            if (catalogBackedUp) {
+                try {
+                    shopCatalog.restoreFrom(catalogBackup);
+                } catch (IOException restoreException) {
+                    getLogger().log(Level.SEVERE, "Could not restore category files after preset application failed.",
+                            restoreException);
+                }
+            }
+            send(sender, "preset-save-error");
+        }
+    }
+
+    private YamlConfiguration shopConfig() {
+        return shopCatalog.configuration();
+    }
+
+    private void saveShopCatalog() throws IOException {
+        for (String id : shopCatalog.categoryIds()) {
+            shopCatalog.saveCategory(id);
+        }
     }
 
     private ConfigurationSection resolvePresetShop(ConfigurationSection preset) {
@@ -674,13 +712,8 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
             return null;
         }
         if (catalogDefinition.getString("source", "").equalsIgnoreCase("defaults")) {
-            try (var stream = getResource("config.yml")) {
-                if (stream == null) {
-                    getLogger().severe("Bundled default shop catalog was not found.");
-                    return null;
-                }
-                YamlConfiguration defaults = YamlConfiguration.loadConfiguration(
-                        new java.io.InputStreamReader(stream, java.nio.charset.StandardCharsets.UTF_8));
+            try {
+                YamlConfiguration defaults = shopCatalog.defaultConfiguration();
                 return defaults.getConfigurationSection("shop");
             } catch (IOException exception) {
                 getLogger().log(Level.SEVERE, "Could not load the bundled default shop catalog.", exception);
@@ -723,19 +756,19 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
                 || !Double.isFinite(sellMultiplier) || sellMultiplier < 0) {
             throw new IllegalArgumentException("Invalid price multiplier in preset.");
         }
-        ConfigurationSection items = getConfig().getConfigurationSection("shop.items");
+        ConfigurationSection items = shopConfig().getConfigurationSection("shop.items");
         if (items == null) {
             return;
         }
         for (String id : items.getKeys(false)) {
             String path = "shop.items." + id;
-            double buy = getConfig().getDouble(path + ".buy-price", 0) * buyMultiplier;
-            double sell = getConfig().getDouble(path + ".sell-price", 0) * sellMultiplier;
+            double buy = shopConfig().getDouble(path + ".buy-price", 0) * buyMultiplier;
+            double sell = shopConfig().getDouble(path + ".sell-price", 0) * sellMultiplier;
             if (!Double.isFinite(buy) || !Double.isFinite(sell)) {
                 throw new IllegalArgumentException("Preset price multiplier exceeds supported price range.");
             }
-            getConfig().set(path + ".buy-price", buy);
-            getConfig().set(path + ".sell-price", sell);
+            shopConfig().set(path + ".buy-price", buy);
+            shopConfig().set(path + ".sell-price", sell);
         }
     }
 
@@ -791,14 +824,21 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
                 return true;
             }
             String path = "shop.categories." + id;
-            if (getConfig().isConfigurationSection(path)) {
+            if (shopConfig().isConfigurationSection(path)) {
                 send(sender, "invalid-usage", "usage", "That category ID is already in use.");
                 return true;
             }
-            getConfig().set(path + ".name", args[2]);
-            getConfig().set(path + ".material", material.name());
-            getConfig().set(path + ".slot", nextCategorySlot());
-            saveConfig();
+            shopConfig().set(path + ".name", args[2]);
+            shopConfig().set(path + ".material", material.name());
+            shopConfig().set(path + ".slot", nextCategorySlot());
+            try {
+                shopCatalog.saveCategory(id);
+            } catch (IOException exception) {
+                shopConfig().set(path, null);
+                getLogger().log(Level.SEVERE, "Could not save category file for '" + id + "'.", exception);
+                send(sender, "preset-save-error");
+                return true;
+            }
             send(sender, "admin-category-added", "category", id);
             return true;
         }
@@ -824,17 +864,24 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
                 send(player, "admin-held-item");
             } else if (Double.isNaN(buy) || Double.isNaN(sell)) {
                 send(player, "invalid-number");
-            } else if (getConfig().isConfigurationSection("shop.items." + id)) {
+            } else if (shopConfig().isConfigurationSection("shop.items." + id)) {
                 send(player, "invalid-usage", "usage", "That item ID is already in use.");
             } else {
                 String path = "shop.items." + id;
-                getConfig().set(path + ".category", category);
-                getConfig().set(path + ".item", held.clone());
-                getConfig().set(path + ".buy-price", buy);
-                getConfig().set(path + ".sell-price", sell);
-                getConfig().set(path + ".name", held.getItemMeta() != null
+                shopConfig().set(path + ".category", category);
+                shopConfig().set(path + ".item", held.clone());
+                shopConfig().set(path + ".buy-price", buy);
+                shopConfig().set(path + ".sell-price", sell);
+                shopConfig().set(path + ".name", held.getItemMeta() != null
                         && held.getItemMeta().hasDisplayName() ? held.getItemMeta().getDisplayName() : prettify(id));
-                saveConfig();
+                try {
+                    shopCatalog.saveCategory(category);
+                } catch (IOException exception) {
+                    shopConfig().set(path, null);
+                    getLogger().log(Level.SEVERE, "Could not save shop item '" + id + "'.", exception);
+                    send(player, "preset-save-error");
+                    return true;
+                }
                 send(player, "admin-item-added", "item", id);
             }
             return true;
@@ -847,14 +894,24 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
             double buy = parseNonNegative(args[2]);
             double sell = parseNonNegative(args[3]);
             String path = "shop.items." + args[1];
-            if (!getConfig().isConfigurationSection(path)) {
+            if (!shopConfig().isConfigurationSection(path)) {
                 send(sender, "unknown-item");
             } else if (Double.isNaN(buy) || Double.isNaN(sell)) {
                 send(sender, "invalid-number");
             } else {
-                getConfig().set(path + ".buy-price", buy);
-                getConfig().set(path + ".sell-price", sell);
-                saveConfig();
+                double oldBuy = shopConfig().getDouble(path + ".buy-price");
+                double oldSell = shopConfig().getDouble(path + ".sell-price");
+                shopConfig().set(path + ".buy-price", buy);
+                shopConfig().set(path + ".sell-price", sell);
+                try {
+                    shopCatalog.saveCategory(shopCatalog.categoryForItem(args[1]));
+                } catch (IOException exception) {
+                    shopConfig().set(path + ".buy-price", oldBuy);
+                    shopConfig().set(path + ".sell-price", oldSell);
+                    getLogger().log(Level.SEVERE, "Could not save new prices for '" + args[1] + "'.", exception);
+                    send(sender, "preset-save-error");
+                    return true;
+                }
                 send(sender, "admin-updated", "item", args[1]);
             }
             return true;
@@ -868,22 +925,22 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
         Inventory inventory = Bukkit.createInventory(holder, 27,
                 color(getConfig().getString("settings.shop-title", "&8Hampta Shop")));
         holder.inventory = inventory;
-        ConfigurationSection categories = getConfig().getConfigurationSection("shop.categories");
+        ConfigurationSection categories = shopConfig().getConfigurationSection("shop.categories");
         if (categories != null) {
             for (String id : categories.getKeys(false)) {
                 String path = "shop.categories." + id;
-                Material material = Material.matchMaterial(getConfig().getString(path + ".material", "CHEST"));
+                Material material = Material.matchMaterial(shopConfig().getString(path + ".material", "CHEST"));
                 if (material == null || !material.isItem()) {
                     material = Material.CHEST;
                 }
                 ItemStack icon = new ItemStack(material);
                 ItemMeta meta = icon.getItemMeta();
                 if (meta != null) {
-                    meta.setDisplayName(color(getConfig().getString(path + ".name", prettify(id))));
+                    meta.setDisplayName(color(shopConfig().getString(path + ".name", prettify(id))));
                     meta.setLore(List.of(color("&7Browse items in this category"), color("&8Click to open")));
                     icon.setItemMeta(meta);
                 }
-                int slot = getConfig().getInt(path + ".slot", inventory.firstEmpty());
+                int slot = shopConfig().getInt(path + ".slot", inventory.firstEmpty());
                 if (slot >= 0 && slot < inventory.getSize()) {
                     inventory.setItem(slot, icon);
                 }
@@ -902,11 +959,12 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
         MenuHolder holder = new MenuHolder(MenuHolder.Kind.ITEMS, player.getUniqueId(), category, query, page,
                 sort, favoritesOnly);
         Inventory inventory = Bukkit.createInventory(holder, 54, color("&8Shop &7- &f" +
-                (category == null ? "Search" : getConfig().getString("shop.categories." + category + ".name", category))));
+                (category == null ? "Search" : shopConfig().getString(
+                        "shop.categories." + category + ".name", category))));
         holder.inventory = inventory;
         List<String> matching = itemIds().stream()
                 .filter(id -> category == null || category.equalsIgnoreCase(
-                        getConfig().getString("shop.items." + id + ".category", "")))
+                        shopConfig().getString("shop.items." + id + ".category", "")))
                 .filter(id -> matchesSearch(id, query))
                 .filter(id -> !favoritesOnly || isFavorite(player, id))
                 .sorted(shopComparator(sort, player))
@@ -1585,7 +1643,7 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
     private String itemAtSlot(MenuHolder holder, int slot) {
         List<String> matching = itemIds().stream()
                 .filter(id -> holder.category == null || holder.category.equalsIgnoreCase(
-                        getConfig().getString("shop.items." + id + ".category", "")))
+                        shopConfig().getString("shop.items." + id + ".category", "")))
                 .filter(id -> matchesSearch(id, holder.query))
                 .filter(id -> !holder.favoritesOnly || isFavorite(Bukkit.getPlayer(holder.owner), id))
                 .sorted(shopComparator(holder.sort, Bukkit.getPlayer(holder.owner)))
@@ -1595,12 +1653,12 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
     }
 
     private String categoryAtSlot(int slot) {
-        ConfigurationSection categories = getConfig().getConfigurationSection("shop.categories");
+        ConfigurationSection categories = shopConfig().getConfigurationSection("shop.categories");
         if (categories == null) {
             return null;
         }
         for (String id : categories.getKeys(false)) {
-            if (getConfig().getInt("shop.categories." + id + ".slot", -1) == slot) {
+            if (shopConfig().getInt("shop.categories." + id + ".slot", -1) == slot) {
                 return id;
             }
         }
@@ -1608,7 +1666,7 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
     }
 
     private List<String> itemIds() {
-        ConfigurationSection section = getConfig().getConfigurationSection("shop.items");
+        ConfigurationSection section = shopConfig().getConfigurationSection("shop.items");
         if (section == null) {
             return Collections.emptyList();
         }
@@ -1621,7 +1679,7 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
             case "sell" -> java.util.Comparator.<String>comparingDouble(id ->
                     player == null ? 0 : sellPrice(id, player)).reversed();
             default -> java.util.Comparator.comparing(id ->
-                    ChatColor.stripColor(color(getConfig().getString("shop.items." + id + ".name", prettify(id))))
+                    ChatColor.stripColor(color(shopConfig().getString("shop.items." + id + ".name", prettify(id))))
                             .toLowerCase(Locale.ROOT));
         };
     }
@@ -1662,7 +1720,7 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
     }
 
     private String findItemId(String value) {
-        ConfigurationSection section = getConfig().getConfigurationSection("shop.items");
+        ConfigurationSection section = shopConfig().getConfigurationSection("shop.items");
         if (section == null) {
             return null;
         }
@@ -1710,7 +1768,7 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
         ItemStack[] contents = player.getInventory().getStorageContents();
         for (String id : itemIds()) {
             if (category != null && !category.equalsIgnoreCase(
-                    getConfig().getString("shop.items." + id + ".category", ""))) {
+                    shopConfig().getString("shop.items." + id + ".category", ""))) {
                 continue;
             }
             int amount = 0;
@@ -1789,31 +1847,31 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
 
     private ItemStack shopItem(String id) {
         String path = "shop.items." + id;
-        ItemStack configured = getConfig().getItemStack(path + ".item");
+        ItemStack configured = shopConfig().getItemStack(path + ".item");
         if (configured != null && !configured.getType().isAir()) {
             return configured.clone();
         }
-        Material material = Material.matchMaterial(getConfig().getString(path + ".material", "STONE"));
+        Material material = Material.matchMaterial(shopConfig().getString(path + ".material", "STONE"));
         if (material == null || !material.isItem()) {
             material = Material.STONE;
         }
         ItemStack item = new ItemStack(material);
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
-            String potionTypeName = getConfig().getString(path + ".potion-type", "");
+            String potionTypeName = shopConfig().getString(path + ".potion-type", "");
             if (!potionTypeName.isBlank() && meta instanceof PotionMeta potionMeta) {
                 try {
                     PotionType potionType = PotionType.valueOf(potionTypeName.toUpperCase(Locale.ROOT));
                     PotionData potionData = new PotionData(potionType,
-                            getConfig().getBoolean(path + ".extended", false),
-                            getConfig().getBoolean(path + ".upgraded", false));
+                            shopConfig().getBoolean(path + ".extended", false),
+                            shopConfig().getBoolean(path + ".upgraded", false));
                     potionMeta.setBasePotionData(potionData);
                 } catch (IllegalArgumentException exception) {
                     getLogger().warning("Invalid potion configuration for shop item '" + id + "'.");
                 }
             }
-            meta.setDisplayName(color(getConfig().getString(path + ".name", prettify(id))));
-            List<String> lore = getConfig().getStringList(path + ".lore").stream().map(this::color).toList();
+            meta.setDisplayName(color(shopConfig().getString(path + ".name", prettify(id))));
+            List<String> lore = shopConfig().getStringList(path + ".lore").stream().map(this::color).toList();
             if (!lore.isEmpty()) {
                 meta.setLore(lore);
             }
@@ -1830,16 +1888,16 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
     }
 
     private boolean matchesShopItem(String id, ItemStack candidate) {
-        ItemStack configured = getConfig().getItemStack("shop.items." + id + ".item");
+        ItemStack configured = shopConfig().getItemStack("shop.items." + id + ".item");
         if (configured != null && !configured.getType().isAir()) {
             return configured.isSimilar(candidate);
         }
         Material material = Material.matchMaterial(
-                getConfig().getString("shop.items." + id + ".material", "STONE"));
+                shopConfig().getString("shop.items." + id + ".material", "STONE"));
         if (material == null || candidate.getType() != material) {
             return false;
         }
-        String potionType = getConfig().getString("shop.items." + id + ".potion-type", "");
+        String potionType = shopConfig().getString("shop.items." + id + ".potion-type", "");
         if (!potionType.isBlank()) {
             ItemMeta expectedMeta = shopItem(id).getItemMeta();
             ItemMeta candidateMeta = candidate.getItemMeta();
@@ -1851,12 +1909,12 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
     }
 
     private double buyPrice(String id, Player player) {
-        double base = Math.max(0, getConfig().getDouble("shop.items." + id + ".buy-price", 0));
+        double base = Math.max(0, shopConfig().getDouble("shop.items." + id + ".buy-price", 0));
         return base * (1.0 - bestPriceModifier(player, "buy-discount-percent") / 100.0);
     }
 
     private double sellPrice(String id, Player player) {
-        double base = Math.max(0, getConfig().getDouble("shop.items." + id + ".sell-price", 0));
+        double base = Math.max(0, shopConfig().getDouble("shop.items." + id + ".sell-price", 0));
         return base * (1.0 + bestPriceModifier(player, "sell-bonus-percent") / 100.0);
     }
 
@@ -1885,15 +1943,15 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
             return true;
         }
         String normalized = query.toLowerCase(Locale.ROOT);
-        String name = ChatColor.stripColor(color(getConfig().getString("shop.items." + id + ".name", prettify(id))));
-        String material = getConfig().getString("shop.items." + id + ".material", "");
+        String name = ChatColor.stripColor(color(shopConfig().getString("shop.items." + id + ".name", prettify(id))));
+        String material = shopConfig().getString("shop.items." + id + ".material", "");
         return id.toLowerCase(Locale.ROOT).contains(normalized)
                 || name.toLowerCase(Locale.ROOT).contains(normalized)
                 || material.toLowerCase(Locale.ROOT).contains(normalized);
     }
 
     private String findCategory(String value) {
-        ConfigurationSection categories = getConfig().getConfigurationSection("shop.categories");
+        ConfigurationSection categories = shopConfig().getConfigurationSection("shop.categories");
         if (categories == null) {
             return null;
         }
@@ -1901,13 +1959,13 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
     }
 
     private int nextCategorySlot() {
-        ConfigurationSection categories = getConfig().getConfigurationSection("shop.categories");
+        ConfigurationSection categories = shopConfig().getConfigurationSection("shop.categories");
         if (categories == null) {
             return 11;
         }
         boolean[] used = new boolean[27];
         for (String id : categories.getKeys(false)) {
-            int slot = getConfig().getInt("shop.categories." + id + ".slot", -1);
+            int slot = shopConfig().getInt("shop.categories." + id + ".slot", -1);
             if (slot >= 0 && slot < used.length) {
                 used[slot] = true;
             }
@@ -2020,7 +2078,7 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         List<String> choices = new ArrayList<>();
         if (command.getName().equalsIgnoreCase("shop") && args.length == 1) {
-            ConfigurationSection categories = getConfig().getConfigurationSection("shop.categories");
+            ConfigurationSection categories = shopConfig().getConfigurationSection("shop.categories");
             if (categories != null) {
                 choices.addAll(categories.getKeys(false));
             }
@@ -2061,7 +2119,7 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
                 choices.addAll(List.of("addcategory", "additem", "setprice"));
             } else if (args.length == 3 && args[0].equalsIgnoreCase("admin")
                     && args[1].equalsIgnoreCase("additem")) {
-                ConfigurationSection categories = getConfig().getConfigurationSection("shop.categories");
+                ConfigurationSection categories = shopConfig().getConfigurationSection("shop.categories");
                 if (categories != null) {
                     choices.addAll(categories.getKeys(false));
                 }

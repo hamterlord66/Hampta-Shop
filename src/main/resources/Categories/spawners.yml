@@ -1,0 +1,29 @@
+category:
+  name: "&cSpawners"
+  material: SPAWNER
+  slot: 14
+
+items:
+  spawner:
+    material: SPAWNER
+    name: "&cMonster Spawner"
+    lore:
+      - "&7A vanilla spawner item."
+      - "&cMob type depends on your server."
+    buy-price: 50000.0
+    sell-price: 0.0
+  zombie_spawn_egg:
+    material: ZOMBIE_SPAWN_EGG
+    name: "&2Zombie Spawn Egg"
+    buy-price: 2500.0
+    sell-price: 500.0
+  skeleton_spawn_egg:
+    material: SKELETON_SPAWN_EGG
+    name: "&fSkeleton Spawn Egg"
+    buy-price: 3000.0
+    sell-price: 600.0
+  cow_spawn_egg:
+    material: COW_SPAWN_EGG
+    name: "&fCow Spawn Egg"
+    buy-price: 1800.0
+    sell-price: 350.0

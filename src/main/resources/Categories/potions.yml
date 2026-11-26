@@ -1,0 +1,31 @@
+category:
+  name: "&dPotions"
+  material: POTION
+  slot: 23
+
+items:
+  speed_potion:
+    material: POTION
+    potion-type: SPEED
+    name: "&bPotion of Swiftness"
+    buy-price: 80.0
+    sell-price: 20.0
+  strength_potion:
+    material: POTION
+    potion-type: INCREASE_DAMAGE
+    name: "&cPotion of Strength"
+    buy-price: 100.0
+    sell-price: 25.0
+  healing_potion:
+    material: POTION
+    potion-type: INSTANT_HEAL
+    name: "&dPotion of Healing"
+    buy-price: 90.0
+    sell-price: 22.5
+  fire_resistance_potion:
+    material: POTION
+    potion-type: FIRE_RESISTANCE
+    extended: true
+    name: "&6Potion of Fire Resistance"
+    buy-price: 120.0
+    sell-price: 30.0

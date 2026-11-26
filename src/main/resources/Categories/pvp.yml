@@ -1,0 +1,31 @@
+category:
+  name: "&4PVP"
+  material: DIAMOND_SWORD
+  slot: 16
+
+items:
+  diamond_sword:
+    material: DIAMOND_SWORD
+    name: "&bDiamond Sword"
+    buy-price: 800.0
+    sell-price: 200.0
+  diamond_chestplate:
+    material: DIAMOND_CHESTPLATE
+    name: "&bDiamond Chestplate"
+    buy-price: 1600.0
+    sell-price: 400.0
+  bow:
+    material: BOW
+    name: "&6Bow"
+    buy-price: 120.0
+    sell-price: 30.0
+  arrow:
+    material: ARROW
+    name: "&fArrow"
+    buy-price: 2.0
+    sell-price: 0.5
+  shield:
+    material: SHIELD
+    name: "&7Shield"
+    buy-price: 80.0
+    sell-price: 20.0

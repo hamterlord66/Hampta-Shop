@@ -14,10 +14,10 @@ The auction house uses a local SQLite database. Its JDBC driver is bundled into 
 
 ## Install
 
-1. Download `Hampta-Shop-1.2.0.jar` from the GitHub Actions **hampta-shop** artifact or build it locally.
+1. Download `Hampta-Shop-1.3.0.jar` from the GitHub Actions **hampta-shop** artifact or build it locally.
 2. Put the JAR in the server's `plugins` folder.
 3. Ensure Vault and an economy provider are installed, then restart the server.
-4. Configure shop items and auction fees in `plugins/HamptaShop/config.yml`.
+4. Configure general settings and auction fees in `plugins/HamptaShop/config.yml`. Shop categories and items are stored separately in `plugins/HamptaShop/Categories/`.
 
 ## Build
 
@@ -25,7 +25,7 @@ The auction house uses a local SQLite database. Its JDBC driver is bundled into 
 mvn --batch-mode clean verify
 ```
 
-The distributable JAR is `target/Hampta-Shop-1.2.0.jar`. The GitHub Actions workflow at `.github/workflows/build.yml` builds the plugin on pushes, pull requests, tags, or manual dispatch and uploads the JAR as an artifact.
+The distributable JAR is `target/Hampta-Shop-1.3.0.jar`. The GitHub Actions workflow at `.github/workflows/build.yml` builds the plugin on pushes, pull requests, tags, or manual dispatch and uploads the JAR as an artifact.
 
 ## Commands
 
@@ -70,7 +70,24 @@ The distributable JAR is `target/Hampta-Shop-1.2.0.jar`. The GitHub Actions work
 | `/hs admin additem <id> <category> <buy> <sell>` | Add the held item to the shop |
 | `/hs admin setprice <id> <buy> <sell>` | Update an item's prices |
 
-Shop GUI: left-click buys one item, shift-left-click buys 16, right-click sells one, and shift-right-click sells all matching items. Categories are **Blocks**, **Misc (Items)**, **Spawners**, **PVP**, **Food**, **Mob drops**, and **Potions**. The starter catalog includes configurable examples for each; potions preserve their configured potion effects, and spawn eggs have distinct entries. The generic monster-spawner item does not assign a mob type: that behavior depends on the server. Built-in presets are `balanced`, `hardcore`, and `generous`. Applying a preset replaces shop categories/items and auction settings, while leaving other settings untouched; the previous `config.yml` is backed up under `plugins/HamptaShop/backups/`.
+Shop GUI: left-click buys one item, shift-left-click buys 16, right-click sells one, and shift-right-click sells all matching items. Categories are **Blocks**, **Misc (Items)**, **Spawners**, **PVP**, **Food**, **Mob drops**, and **Potions**. Each category and its items live in an individual YAML file such as `plugins/HamptaShop/Categories/blocks.yml`:
+
+```yaml
+category:
+  name: "&aBlocks"
+  material: BRICKS
+  slot: 10
+items:
+  oak_planks:
+    material: OAK_PLANKS
+    name: "&fOak Planks"
+    buy-price: 4.0
+    sell-price: 1.0
+```
+
+The item ID is its YAML key; the category is inferred from the file name. Item fields such as `lore`, `potion-type`, `extended`, and `upgraded` are optional. The starter catalog includes configurable examples for each category; potions preserve their configured potion effects, and spawn eggs have distinct entries. The generic monster-spawner item does not assign a mob type: that behavior depends on the server. Use `/hamptashop reload` after manually editing category files; `/hs admin addcategory`, `/hs admin additem`, and `/hs admin setprice` write changes to those files.
+
+Built-in presets are `balanced`, `hardcore`, and `generous`. Applying a preset replaces shop categories/items and auction settings, while leaving other settings untouched. The previous `config.yml` and category files are backed up under `plugins/HamptaShop/backups/`.
 
 The category browser and item shop menus both display the player's live Vault balance.
 
@@ -94,7 +111,7 @@ These features are backed by SQLite auction persistence and player preferences i
 
 ## Configuration and placeholders
 
-The default shop catalog, auction expiry, listing fee, sale fee, and listing limits are in `config.yml`. Shop entries use `buy-price` and `sell-price` per item; set either to `0` to disable that direction. Categories and entries can also be added or repriced in-game.
+General settings, auction expiry, listing fee, sale fee, and listing limits are in `config.yml`. Shop entries use `buy-price` and `sell-price` per item; set either to `0` to disable that direction. Category and item definitions are not stored in `config.yml`; edit their individual files under `Categories/` or use the in-game admin commands.
 
 When PlaceholderAPI is installed, `%hamptashop_balance%` returns the player's Vault-formatted balance. PlaceholderAPI is optional; Vault and an active Vault economy provider are required.
 
@@ -111,4 +128,4 @@ LuckPerms works through Bukkit's standard permission system; no LuckPerms API de
 
 `hamptashop.shop.edit` allows adding categories/items and changing prices. `hamptashop.preset.apply` allows applying presets. `hamptashop.preset.manage` allows saving/deleting custom presets. `hamptashop.admin.reload` allows reloads, and `hamptashop.admin` remains the full-access permission for compatibility.
 
-Preset definitions are in `plugins/HamptaShop/presets.yml`. Server owners can edit them there, apply them in-game, or save the active shop/auction configuration as a named custom preset.
+Preset definitions are in `plugins/HamptaShop/presets.yml`. Server owners can edit them there, apply them in-game, or save the active shop/auction configuration as a named custom preset. Existing inline catalogs are migrated into the category files on first startup, with backups created before migration.
