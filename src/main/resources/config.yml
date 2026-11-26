@@ -1,7 +1,7 @@
 settings:
   prefix: "&8[&bHampta Shop&8] &7"
   currency-fallback: "$"
-  shop-title: "&8Hampta Shop"
+  shop-title: "&8Shop"
   auction-title: "&8Auction House"
 
 shop:
@@ -68,4 +68,4 @@ auction:
   expiry-days: 7
   max-active-listings: 10
   minimum-price: 0.01
-  maximum-price: 1000000000.0
+  maximum-price: 2124000000.0
