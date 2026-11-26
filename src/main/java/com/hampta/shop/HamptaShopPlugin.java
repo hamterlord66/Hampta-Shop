@@ -9,6 +9,7 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.PluginCommand;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -62,7 +63,7 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
             return;
         }
         for (String commandName : List.of("shop", "sell", "ah", "hamptashop")) {
-            Command command = getCommand(commandName);
+            PluginCommand command = getCommand(commandName);
             if (command == null) {
                 getLogger().severe("Missing command registration: " + commandName);
                 getServer().getPluginManager().disablePlugin(this);
