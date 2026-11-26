@@ -72,6 +72,8 @@ The distributable JAR is `target/Hampta-Shop-1.1.0.jar`. The GitHub Actions work
 
 Shop GUI: left-click buys one item, shift-left-click buys 16, right-click sells one, and shift-right-click sells all matching items. Built-in presets are `balanced`, `hardcore`, and `generous`. Applying a preset replaces shop categories/items and auction settings, while leaving other settings untouched; the previous `config.yml` is backed up under `plugins/HamptaShop/backups/`.
 
+The category browser and item shop menus both display the player's live Vault balance.
+
 Price modifiers can give permission groups discounts and improved sale prices. Assign the configured permission to a LuckPerms group (for example, `/lp group vip permission set hamptashop.discount.vip true`). Only the highest applicable discount and highest sell bonus are used; they do not stack. Discounts are capped at 90% and sell bonuses at 100%.
 
 ### Shop: 20 capabilities

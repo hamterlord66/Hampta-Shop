@@ -702,6 +702,7 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
                 }
             }
         }
+        inventory.setItem(22, balanceDisplayItem(player));
         player.openInventory(inventory);
     }
 
@@ -752,6 +753,7 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
                 List.of("&7Click to change item sorting.")));
         inventory.setItem(51, namedItem(Material.BOOK, "&eCategories",
                 List.of("&7Return to the category menu.")));
+        inventory.setItem(50, balanceDisplayItem(player));
         if (matching.isEmpty()) {
             inventory.setItem(22, namedItem(Material.BARRIER, "&cNo items found",
                     List.of("&7Try a different search or category.")));
@@ -1722,6 +1724,12 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
             item.setItemMeta(meta);
         }
         return item;
+    }
+
+    private ItemStack balanceDisplayItem(Player player) {
+        return namedItem(Material.GOLD_INGOT, "&6Your Balance",
+                List.of("&7Available: &a" + formatCurrency(economy.getBalance(player)),
+                        "&8Powered by Vault"));
     }
 
     private String formatCurrency(double amount) {
