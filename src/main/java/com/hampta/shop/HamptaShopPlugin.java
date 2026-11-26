@@ -326,6 +326,12 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
             send(sender, "preset-not-found", "preset", id);
             return true;
         }
+        if (preset.getConfigurationSection("shop.categories") == null
+                || preset.getConfigurationSection("shop.items") == null
+                || preset.getConfigurationSection("auction") == null) {
+            send(sender, "preset-invalid", "preset", id);
+            return true;
+        }
         applyPreset(sender, id, preset);
         return true;
     }
