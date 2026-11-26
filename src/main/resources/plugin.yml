@@ -1,0 +1,37 @@
+name: HamptaShop
+version: ${project.version}
+main: com.hampta.shop.HamptaShopPlugin
+api-version: '1.20'
+description: A polished economy shop and player auction house.
+author: hamterlord66
+depend: [Vault]
+softdepend: [PlaceholderAPI]
+commands:
+  shop:
+    description: Browse the Hampta Shop.
+    usage: /shop [category|search <query>]
+    aliases: [store]
+  sell:
+    description: Sell items to the server shop.
+    usage: /sell <hand|all>
+  ah:
+    description: Browse and manage auction house listings.
+    usage: /ah [sell <price>|mine|cancel <id>|claim]
+    aliases: [auction, auctionhouse]
+  hamptashop:
+    description: Hampta Shop administration.
+    usage: /hamptashop <reload|admin>
+    aliases: [hs]
+permissions:
+  hamptashop.use:
+    description: Use the shop and auction house.
+    default: true
+  hamptashop.sell:
+    description: Sell items to the server shop.
+    default: true
+  hamptashop.auction:
+    description: Create and manage auction listings.
+    default: true
+  hamptashop.admin:
+    description: Manage Hampta Shop configuration in-game.
+    default: op
