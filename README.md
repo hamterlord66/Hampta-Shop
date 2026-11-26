@@ -1,23 +1,22 @@
 # Hampta Shop
 
-Hampta Shop is a Vault-powered server shop and player auction house for Minecraft Java servers. It targets the Spigot API 1.20.4 baseline and is intended for Paper and Spigot 1.20.4 and newer.
+Hampta Shop is a standalone economy, server shop, and player auction house for Minecraft Java servers. It targets the Spigot API 1.20.4 baseline and is intended for Paper and Spigot 1.20.4 and newer.
 
 ## Requirements
 
 - Java 17 or newer. Minecraft 1.21 servers themselves require Java 21.
 - Paper or Spigot 1.20.4+
-- Vault and a Vault-compatible economy provider
 - PlaceholderAPI (optional)
 - LuckPerms (optional; recommended for per-rank staff permissions)
 
-The auction house uses a local SQLite database. Its JDBC driver is bundled into the plugin JAR.
+Player balances and auction listings use local SQLite databases. Their JDBC driver is bundled into the plugin JAR. No Vault plugin or external economy provider is required.
 
 ## Install
 
-1. Download `Hampta-Shop-1.5.1.jar` from the GitHub Actions **hampta-shop** artifact or build it locally.
+1. Download `Hampta-Shop-1.6.0.jar` from the GitHub Actions **hampta-shop** artifact or build it locally.
 2. Put the JAR in the server's `plugins` folder.
-3. Ensure Vault and an economy provider are installed, then restart the server.
-4. Configure general settings and auction fees in `plugins/HamptaShop/config.yml`. Shop categories and items are stored separately in `plugins/HamptaShop/Categories/`.
+3. Restart the server; no Vault plugin or economy provider is needed.
+4. Configure the economy, currency symbol, general settings, and auction fees in `plugins/HamptaShop/config.yml`. Shop categories and items are stored separately in `plugins/HamptaShop/Categories/`.
 
 ## Build
 
@@ -25,7 +24,7 @@ The auction house uses a local SQLite database. Its JDBC driver is bundled into 
 mvn --batch-mode clean verify
 ```
 
-The distributable JAR is `target/Hampta-Shop-1.5.1.jar`. The GitHub Actions workflow at `.github/workflows/build.yml` builds the plugin on pushes, pull requests, tags, or manual dispatch and uploads the JAR as an artifact.
+The distributable JAR is `target/Hampta-Shop-1.6.0.jar`. The GitHub Actions workflow at `.github/workflows/build.yml` builds the plugin on pushes, pull requests, tags, or manual dispatch and uploads the JAR as an artifact.
 
 ## Commands
 
@@ -39,6 +38,9 @@ The distributable JAR is `target/Hampta-Shop-1.5.1.jar`. The GitHub Actions work
 | `/shop sort <name\|buy\|sell>` | Browse the whole shop sorted by name or price |
 | `/shop favorite <item-id>` | Toggle an item in your saved favorites |
 | `/shop favorites` | Browse only your saved favorite items |
+| `/balance` (`/bal`) | Check your balance |
+| `/balance <player>` | View another player's balance (permission required) |
+| `/pay <player> <amount>` | Pay an online player |
 | `/sell hand [amount]` | Sell some or all of a matching held stack |
 | `/sell all` | Preview a sale and request confirmation |
 | `/sell confirm` | Confirm a pending bulk sale within 30 seconds |
@@ -66,6 +68,7 @@ The distributable JAR is `target/Hampta-Shop-1.5.1.jar`. The GitHub Actions work
 | `/hamptashop preset <name>` | Apply a preset (creates a config backup first) |
 | `/hamptashop preset save <name>` | Save current shop and auction settings as a custom preset |
 | `/hamptashop preset delete <name>` | Delete a custom preset |
+| `/hamptashop admin balance <player> <set\|add\|remove> <amount>` | Manage a player's balance |
 | `/hs admin addcategory <id> <name> <material>` | Add a category in-game |
 | `/hs admin additem <id> <category> <buy> <sell>` | Add the held item to the shop |
 | `/hs admin setprice <id> <buy> <sell>` | Update an item's prices |
@@ -91,7 +94,7 @@ The bundled catalog contains all 1,657 non-air item IDs in Minecraft Java 26.3, 
 
 Built-in shop price presets are `normal` (base prices), `inflation` (4x all shop purchase prices), and `sale` (90% of all shop purchase prices). They scale prices dynamically across every category and item—including items added later—without rewriting category files or changing sell-to-server payouts. Applying one backs up `config.yml` and leaves shop edits and auction settings intact. Custom presets can still save and restore the shop catalog and auction settings. On upgrade, existing custom presets are preserved and the built-in presets are updated.
 
-The category browser and item shop menus both display the player's live Vault balance.
+The category browser and item shop menus display the player's live Hampta Shop balance.
 
 On upgrade from older versions, the plugin replaces the previous built-in categories and shop items once with this catalog. It backs up both the old config and preset files under `plugins/HamptaShop/backups/` first. Later restarts will not overwrite shop edits.
 
@@ -103,7 +106,7 @@ Price modifiers can give permission groups discounts and improved sale prices. A
 
 ### Selling: 15 capabilities
 
-1. Sell the held stack; 2. sell an exact held quantity; 3. preview sell value; 4. preview bulk inventory sales; 5. confirm bulk sales; 6. cancel pending sales; 7. 30-second confirmation expiry; 8. sell hotbar items; 9. sell a category; 10. sell configured catalog items only; 11. direct `/shop sell`; 12. partial direct quantities; 13. right-click one item in shop; 14. shift-right-click all matching items; 15. restore items if Vault rejects a deposit.
+1. Sell the held stack; 2. sell an exact held quantity; 3. preview sell value; 4. preview bulk inventory sales; 5. confirm bulk sales; 6. cancel pending sales; 7. 30-second confirmation expiry; 8. sell hotbar items; 9. sell a category; 10. sell configured catalog items only; 11. direct `/shop sell`; 12. partial direct quantities; 13. right-click one item in shop; 14. shift-right-click all matching items; 15. restore items if a payout cannot be credited.
 
 ### Auction house: 21 capabilities
 
@@ -113,9 +116,11 @@ These features are backed by SQLite auction persistence and player preferences i
 
 ## Configuration and placeholders
 
+The internal economy stores accounts in `plugins/HamptaShop/economy.db`; balances are keyed by Minecraft player UUID and persist across restarts. `economy.starting-balance` applies only when a player's account is first created, while `economy.maximum-balance` caps each account. `settings.currency-symbol` sets the currency prefix. Use `/pay` for player-to-player transfers and `/hamptashop admin balance` to set, add, or remove funds. Existing balances from Vault or another economy are not imported automatically; set balances with the admin command if you need to migrate players.
+
 General settings, auction expiry, listing fee, sale fee, and listing limits are in `config.yml`. Shop entries use `buy-price` and `sell-price` per item; set either to `0` to disable that direction. Category and item definitions are not stored in `config.yml`; edit their individual files under `Categories/` or use the in-game admin commands.
 
-When PlaceholderAPI is installed, `%hamptashop_balance%` returns the player's Vault-formatted balance. PlaceholderAPI is optional; Vault and an active Vault economy provider are required.
+When PlaceholderAPI is installed, `%hamptashop_balance%` returns the player's formatted Hampta Shop balance. PlaceholderAPI is optional.
 
 ### LuckPerms staff roles
 
@@ -125,9 +130,10 @@ LuckPerms works through Bukkit's standard permission system; no LuckPerms API de
 /lp group shop-editor permission set hamptashop.shop.edit true
 /lp group economy-manager permission set hamptashop.preset.apply true
 /lp group economy-manager permission set hamptashop.preset.manage true
+/lp group economy-manager permission set hamptashop.economy.admin true
 /lp group admin permission set hamptashop.admin true
 ```
 
-`hamptashop.shop.edit` allows adding categories/items and changing prices. `hamptashop.preset.apply` allows applying presets. `hamptashop.preset.manage` allows saving/deleting custom presets. `hamptashop.admin.reload` allows reloads, and `hamptashop.admin` remains the full-access permission for compatibility.
+`hamptashop.shop.edit` allows adding categories/items and changing prices. `hamptashop.preset.apply` allows applying presets. `hamptashop.preset.manage` allows saving/deleting custom presets. `hamptashop.economy.admin` allows managing account balances; `hamptashop.economy.view-others` allows viewing other balances. `hamptashop.admin.reload` allows reloads, and `hamptashop.admin` remains the full-access permission for compatibility.
 
 Preset definitions are in `plugins/HamptaShop/presets.yml`. Server owners can edit them there, apply them in-game, or save the active shop/auction configuration as a named custom preset. Existing inline catalogs are migrated into category files on first startup, with backups created before migration.

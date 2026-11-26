@@ -1,10 +1,9 @@
 package com.hampta.shop;
 
-import net.milkbowl.vault.economy.Economy;
-import net.milkbowl.vault.economy.EconomyResponse;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -25,7 +24,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
-import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionType;
@@ -35,6 +33,8 @@ import org.bukkit.util.StringUtil;
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -49,7 +49,7 @@ import java.util.logging.Level;
 
 public final class HamptaShopPlugin extends JavaPlugin implements Listener, CommandExecutor, TabCompleter {
     private static final int PAGE_SIZE = 45;
-    private Economy economy;
+    private HamptaEconomy economy;
     private AuctionHouseDatabase auctionDatabase;
     private BukkitTask expiryTask;
     private YamlConfiguration messages;
@@ -89,18 +89,23 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
         }
         playerDataFile = new File(getDataFolder(), "players.yml");
         playerData = YamlConfiguration.loadConfiguration(playerDataFile);
-        setupEconomy();
-        if (!isEnabled()) {
-            return;
-        }
         try {
+            double startingBalance = getConfig().getDouble("economy.starting-balance", 0.0);
+            double maximumBalance = getConfig().getDouble("economy.maximum-balance", 2_147_483_647.0);
+            economy = new HamptaEconomy(new File(getDataFolder(), "economy.db"),
+                    startingBalance, maximumBalance);
             auctionDatabase = new AuctionHouseDatabase(new java.io.File(getDataFolder(), "auctions.db"));
         } catch (SQLException exception) {
-            getLogger().log(Level.SEVERE, "Could not open the auction-house database.", exception);
+            getLogger().log(Level.SEVERE, "Could not open the economy or auction-house database.", exception);
+            getServer().getPluginManager().disablePlugin(this);
+            return;
+        } catch (IllegalArgumentException exception) {
+            getLogger().log(Level.SEVERE, "Invalid economy balance configuration.", exception);
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
-        for (String commandName : List.of("shop", "sell", "ah", "hamptashop", "ec", "craft", "anvil")) {
+        for (String commandName : List.of(
+                "shop", "sell", "ah", "hamptashop", "ec", "craft", "anvil", "balance", "pay")) {
             PluginCommand command = getCommand(commandName);
             if (command == null) {
                 getLogger().severe("Missing command registration: " + commandName);
@@ -130,22 +135,13 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
                 getLogger().log(Level.WARNING, "Could not close the auction-house database cleanly.", exception);
             }
         }
-    }
-
-    private void setupEconomy() {
-        if (getServer().getPluginManager().getPlugin("Vault") == null) {
-            getLogger().severe("Vault is required.");
-            getServer().getPluginManager().disablePlugin(this);
-            return;
+        if (economy != null) {
+            try {
+                economy.close();
+            } catch (SQLException exception) {
+                getLogger().log(Level.WARNING, "Could not close the economy database cleanly.", exception);
+            }
         }
-        RegisteredServiceProvider<Economy> registration =
-                getServer().getServicesManager().getRegistration(Economy.class);
-        if (registration == null) {
-            getLogger().severe("No Vault economy provider is installed.");
-            getServer().getPluginManager().disablePlugin(this);
-            return;
-        }
-        economy = registration.getProvider();
     }
 
     private boolean migrateShopCatalog() {
@@ -216,8 +212,52 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
         presets.save(presetsFile);
     }
 
-    Economy getEconomy() {
-        return economy;
+    double getBalance(UUID playerId) {
+        try {
+            return economy.getBalance(playerId);
+        } catch (SQLException exception) {
+            getLogger().log(Level.SEVERE, "Could not read economy balance for " + playerId, exception);
+            return Double.NaN;
+        }
+    }
+
+    private HamptaEconomy.Result depositBalance(UUID playerId, double amount) {
+        try {
+            return economy.deposit(playerId, amount);
+        } catch (SQLException exception) {
+            getLogger().log(Level.SEVERE, "Could not deposit " + amount + " to economy account " + playerId,
+                    exception);
+            return HamptaEconomy.Result.ERROR;
+        }
+    }
+
+    private HamptaEconomy.Result withdrawBalance(UUID playerId, double amount) {
+        try {
+            return economy.withdraw(playerId, amount);
+        } catch (SQLException exception) {
+            getLogger().log(Level.SEVERE, "Could not withdraw " + amount + " from economy account " + playerId,
+                    exception);
+            return HamptaEconomy.Result.ERROR;
+        }
+    }
+
+    private HamptaEconomy.Result transferBalance(UUID from, UUID to, double amount) {
+        try {
+            return economy.transfer(from, to, amount);
+        } catch (SQLException exception) {
+            getLogger().log(Level.SEVERE, "Could not transfer " + amount + " between economy accounts.", exception);
+            return HamptaEconomy.Result.ERROR;
+        }
+    }
+
+    String formatCurrency(double amount) {
+        if (!Double.isFinite(amount)) {
+            return "Unavailable";
+        }
+        DecimalFormat format = new DecimalFormat("#,##0.00",
+                DecimalFormatSymbols.getInstance(Locale.US));
+        return getConfig().getString("settings.currency-symbol",
+                getConfig().getString("settings.currency-fallback", "$")) + format.format(amount);
     }
 
     @Override
@@ -227,11 +267,70 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
             case "sell" -> handleSell(sender, args);
             case "ah" -> handleAuction(sender, args);
             case "hamptashop" -> handleAdmin(sender, args);
+            case "balance" -> handleBalance(sender, args);
+            case "pay" -> handlePay(sender, args);
             case "ec" -> handleUtility(sender, "enderchest");
             case "craft" -> handleUtility(sender, "crafting");
             case "anvil" -> handleUtility(sender, "anvil");
             default -> false;
         };
+    }
+
+    private boolean handleBalance(CommandSender sender, String[] args) {
+        if (args.length == 0 && sender instanceof Player player) {
+            send(player, "balance-own", "balance", formatCurrency(getBalance(player.getUniqueId())));
+            return true;
+        }
+        if (args.length == 1 && sender.hasPermission("hamptashop.economy.view-others")) {
+            OfflinePlayer target = Bukkit.getOfflinePlayer(args[0]);
+            if (!target.isOnline() && !target.hasPlayedBefore()) {
+                send(sender, "pay-player-not-found");
+                return true;
+            }
+            send(sender, "balance-other", "player",
+                    target.getName() == null ? args[0] : target.getName(),
+                    "balance", formatCurrency(getBalance(target.getUniqueId())));
+            return true;
+        }
+        send(sender, "invalid-usage", "usage", "/balance [player]");
+        return true;
+    }
+
+    private boolean handlePay(CommandSender sender, String[] args) {
+        if (!(sender instanceof Player player)) {
+            send(sender, "player-only");
+            return true;
+        }
+        if (!player.hasPermission("hamptashop.pay")) {
+            send(player, "no-permission");
+            return true;
+        }
+        if (args.length != 2) {
+            send(player, "invalid-usage", "usage", "/pay <player> <amount>");
+            return true;
+        }
+        Player target = Bukkit.getPlayerExact(args[0]);
+        double amount = parsePositive(args[1]);
+        if (target == null) {
+            send(player, "pay-player-not-found");
+        } else if (target.getUniqueId().equals(player.getUniqueId())) {
+            send(player, "pay-self");
+        } else if (Double.isNaN(amount) || amount > economy.maximumBalance()) {
+            send(player, "invalid-number");
+        } else {
+            HamptaEconomy.Result result = transferBalance(player.getUniqueId(), target.getUniqueId(), amount);
+            if (result == HamptaEconomy.Result.SUCCESS) {
+                send(player, "pay-sent", "amount", formatCurrency(amount), "player", target.getName());
+                send(target, "pay-received", "amount", formatCurrency(amount), "player", player.getName());
+            } else if (result == HamptaEconomy.Result.INSUFFICIENT_FUNDS) {
+                send(player, "insufficient-funds");
+            } else if (result == HamptaEconomy.Result.BALANCE_LIMIT) {
+                send(player, "economy-balance-limit");
+            } else {
+                send(player, "economy-error");
+            }
+        }
+        return true;
     }
 
     private boolean handleShop(CommandSender sender, String[] args) {
@@ -507,6 +606,14 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
         if (args[0].equalsIgnoreCase("preset")) {
             return handlePreset(sender, Arrays.copyOfRange(args, 1, args.length));
         }
+        if (args.length >= 2 && args[0].equalsIgnoreCase("admin")
+                && args[1].equalsIgnoreCase("balance")) {
+            if (!hasAdminPermission(sender, "hamptashop.economy.admin")) {
+                send(sender, "no-permission");
+                return true;
+            }
+            return handleAdminBalance(sender, Arrays.copyOfRange(args, 2, args.length));
+        }
         if (args.length >= 2 && args[0].equalsIgnoreCase("admin")) {
             if (!hasAdminPermission(sender, "hamptashop.shop.edit")) {
                 send(sender, "no-permission");
@@ -517,6 +624,51 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
         send(sender, "invalid-usage", "usage",
                 "/hamptashop <reload|preset <name>|preset list|preset save <name>|preset delete <name>|admin ...>");
         return true;
+    }
+
+    private boolean handleAdminBalance(CommandSender sender, String[] args) {
+        if (args.length != 3) {
+            send(sender, "invalid-usage", "usage",
+                    "/hamptashop admin balance <player> <set|add|remove> <amount>");
+            return true;
+        }
+        OfflinePlayer target = Bukkit.getOfflinePlayer(args[0]);
+        if (!target.isOnline() && !target.hasPlayedBefore()) {
+            send(sender, "pay-player-not-found");
+            return true;
+        }
+        double amount = parseNonNegative(args[2]);
+        if (Double.isNaN(amount) || amount > economy.maximumBalance()) {
+            send(sender, "invalid-number");
+            return true;
+        }
+        HamptaEconomy.Result result = switch (args[1].toLowerCase(Locale.ROOT)) {
+            case "set" -> setBalance(target.getUniqueId(), amount);
+            case "add" -> depositBalance(target.getUniqueId(), amount);
+            case "remove" -> withdrawBalance(target.getUniqueId(), amount);
+            default -> HamptaEconomy.Result.INVALID_AMOUNT;
+        };
+        if (result == HamptaEconomy.Result.SUCCESS) {
+            send(sender, "admin-balance-updated", "player",
+                    target.getName() == null ? args[0] : target.getName(),
+                    "balance", formatCurrency(getBalance(target.getUniqueId())));
+        } else if (result == HamptaEconomy.Result.INSUFFICIENT_FUNDS) {
+            send(sender, "insufficient-funds");
+        } else if (result == HamptaEconomy.Result.BALANCE_LIMIT) {
+            send(sender, "economy-balance-limit");
+        } else {
+            send(sender, "economy-error");
+        }
+        return true;
+    }
+
+    private HamptaEconomy.Result setBalance(UUID playerId, double amount) {
+        try {
+            return economy.setBalance(playerId, amount);
+        } catch (SQLException exception) {
+            getLogger().log(Level.SEVERE, "Could not set economy balance for " + playerId, exception);
+            return HamptaEconomy.Result.ERROR;
+        }
     }
 
     private boolean handlePreset(CommandSender sender, String[] args) {
@@ -1254,15 +1406,15 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
             send(player, "inventory-full");
             return;
         }
-        EconomyResponse response = economy.withdrawPlayer(player, total);
-        if (!response.transactionSuccess()) {
-            send(player, "insufficient-funds");
+        HamptaEconomy.Result withdrawal = withdrawBalance(player.getUniqueId(), total);
+        if (withdrawal != HamptaEconomy.Result.SUCCESS) {
+            send(player, withdrawal == HamptaEconomy.Result.INSUFFICIENT_FUNDS
+                    ? "insufficient-funds" : "economy-error");
             return;
         }
         Map<Integer, ItemStack> remainder = addItems(player.getInventory(), product, amount);
         if (!remainder.isEmpty()) {
-            EconomyResponse refund = economy.depositPlayer(player, total);
-            if (!refund.transactionSuccess()) {
+            if (depositBalance(player.getUniqueId(), total) != HamptaEconomy.Result.SUCCESS) {
                 getLogger().severe("Could not refund a shop purchase to " + player.getName());
             }
             send(player, "inventory-full");
@@ -1284,10 +1436,11 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
             return 0;
         }
         double total = unitPrice * amount;
-        EconomyResponse response = economy.depositPlayer(player, total);
-        if (!response.transactionSuccess()) {
+        HamptaEconomy.Result deposit = depositBalance(player.getUniqueId(), total);
+        if (deposit != HamptaEconomy.Result.SUCCESS) {
             restoreItems(player, removed);
-            send(player, "economy-error");
+            send(player, deposit == HamptaEconomy.Result.BALANCE_LIMIT
+                    ? "economy-balance-limit" : "economy-error");
             return 0;
         }
         send(player, "shop-sold", "amount", Integer.toString(amount),
@@ -1310,10 +1463,11 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
         } else {
             held.setAmount(held.getAmount() - amount);
         }
-        EconomyResponse response = economy.depositPlayer(player, total);
-        if (!response.transactionSuccess()) {
-            player.getInventory().addItem(sold);
-            send(player, "economy-error");
+        HamptaEconomy.Result deposit = depositBalance(player.getUniqueId(), total);
+        if (deposit != HamptaEconomy.Result.SUCCESS) {
+            giveOrDrop(player, sold);
+            send(player, deposit == HamptaEconomy.Result.BALANCE_LIMIT
+                    ? "economy-balance-limit" : "economy-error");
             return;
         }
         send(player, "shop-sold", "amount", Integer.toString(sold.getAmount()),
@@ -1344,9 +1498,13 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
                 return true;
             }
             double fee = Math.max(0, getConfig().getDouble("auction.listing-fee", 0.0));
-            if (fee > 0 && !economy.withdrawPlayer(player, fee).transactionSuccess()) {
-                send(player, "ah-fee-error");
-                return true;
+            if (fee > 0) {
+                HamptaEconomy.Result feeResult = withdrawBalance(player.getUniqueId(), fee);
+                if (feeResult != HamptaEconomy.Result.SUCCESS) {
+                    send(player, feeResult == HamptaEconomy.Result.INSUFFICIENT_FUNDS
+                            ? "ah-fee-error" : "economy-error");
+                    return true;
+                }
             }
             ItemStack listingItem = hand.clone();
             listingItem.setAmount(requestedAmount);
@@ -1364,8 +1522,7 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
                 notifyWatchers(player, listingItem, price, id);
             } catch (SQLException exception) {
                 if (fee > 0) {
-                    EconomyResponse refund = economy.depositPlayer(player, fee);
-                    if (!refund.transactionSuccess()) {
+                    if (depositBalance(player.getUniqueId(), fee) != HamptaEconomy.Result.SUCCESS) {
                         getLogger().severe("Could not refund the listing fee to " + player.getName());
                     }
                 }
@@ -1394,9 +1551,10 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
                 send(buyer, "inventory-full");
                 return;
             }
-            EconomyResponse withdrawal = economy.withdrawPlayer(buyer, listing.price());
-            if (!withdrawal.transactionSuccess()) {
-                send(buyer, "insufficient-funds");
+            HamptaEconomy.Result withdrawal = withdrawBalance(buyer.getUniqueId(), listing.price());
+            if (withdrawal != HamptaEconomy.Result.SUCCESS) {
+                send(buyer, withdrawal == HamptaEconomy.Result.INSUFFICIENT_FUNDS
+                        ? "insufficient-funds" : "economy-error");
                 return;
             }
             AuctionListing taken;
@@ -1414,11 +1572,12 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
             double feePercent = Math.min(100.0, Math.max(0.0,
                     getConfig().getDouble("auction.sale-fee-percent", 5.0)));
             double payout = listing.price() * (1.0 - feePercent / 100.0);
-            EconomyResponse deposit = economy.depositPlayer(Bukkit.getOfflinePlayer(listing.sellerId()), payout);
-            if (!deposit.transactionSuccess()) {
+            HamptaEconomy.Result deposit = depositBalance(listing.sellerId(), payout);
+            if (deposit != HamptaEconomy.Result.SUCCESS) {
                 refundBuyer(buyer, listing.price());
                 restoreListing(taken);
-                send(buyer, "economy-error");
+                send(buyer, deposit == HamptaEconomy.Result.BALANCE_LIMIT
+                        ? "economy-balance-limit" : "economy-error");
                 return;
             }
             Map<Integer, ItemStack> remainder = buyer.getInventory().addItem(taken.item().clone());
@@ -1431,8 +1590,7 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
     }
 
     private void refundBuyer(Player buyer, double amount) {
-        EconomyResponse refund = economy.depositPlayer(buyer, amount);
-        if (!refund.transactionSuccess()) {
+        if (depositBalance(buyer.getUniqueId(), amount) != HamptaEconomy.Result.SUCCESS) {
             getLogger().severe("Could not refund " + amount + " to " + buyer.getName()
                     + " after an auction transaction failed.");
         }
@@ -1821,10 +1979,11 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
             send(player, "invalid-number");
             return 0;
         }
-        EconomyResponse response = economy.depositPlayer(player, total);
-        if (!response.transactionSuccess()) {
+        HamptaEconomy.Result deposit = depositBalance(player.getUniqueId(), total);
+        if (deposit != HamptaEconomy.Result.SUCCESS) {
             restoreItems(player, removed);
-            send(player, "economy-error");
+            send(player, deposit == HamptaEconomy.Result.BALANCE_LIMIT
+                    ? "economy-balance-limit" : "economy-error");
             return 0;
         }
         send(player, "shop-sold", "amount", Integer.toString(amount),
@@ -2078,13 +2237,8 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
 
     private ItemStack balanceDisplayItem(Player player) {
         return namedItem(Material.GOLD_INGOT, "&6Your Balance",
-                List.of("&7Available: &a" + formatCurrency(economy.getBalance(player)),
-                        "&8Powered by Vault"));
-    }
-
-    private String formatCurrency(double amount) {
-        return economy == null ? getConfig().getString("settings.currency-fallback", "$") + amount
-                : economy.format(amount);
+                List.of("&7Available: &a" + formatCurrency(getBalance(player.getUniqueId())),
+                        "&8Hampta Shop Economy"));
     }
 
     private String displayName(ItemStack item) {
@@ -2195,14 +2349,24 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
                     choices.addAll(customPresets.getKeys(false));
                 }
             } else if (args.length == 2 && args[0].equalsIgnoreCase("admin")) {
-                choices.addAll(List.of("addcategory", "additem", "setprice"));
+                choices.addAll(List.of("addcategory", "additem", "setprice", "balance"));
             } else if (args.length == 3 && args[0].equalsIgnoreCase("admin")
                     && args[1].equalsIgnoreCase("additem")) {
                 ConfigurationSection categories = shopConfig().getConfigurationSection("shop.categories");
                 if (categories != null) {
                     choices.addAll(categories.getKeys(false));
                 }
+            } else if (args.length == 3 && args[0].equalsIgnoreCase("admin")
+                    && args[1].equalsIgnoreCase("balance")) {
+                choices.addAll(Bukkit.getOnlinePlayers().stream().map(Player::getName).toList());
+            } else if (args.length == 4 && args[0].equalsIgnoreCase("admin")
+                    && args[1].equalsIgnoreCase("balance")) {
+                choices.addAll(List.of("set", "add", "remove"));
             }
+        } else if ((command.getName().equalsIgnoreCase("pay") && args.length == 1)
+                || (command.getName().equalsIgnoreCase("balance") && args.length == 1
+                && sender.hasPermission("hamptashop.economy.view-others"))) {
+            choices.addAll(Bukkit.getOnlinePlayers().stream().map(Player::getName).toList());
         }
         return StringUtil.copyPartialMatches(args[args.length - 1], choices, new ArrayList<>());
     }

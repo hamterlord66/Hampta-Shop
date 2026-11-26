@@ -5,9 +5,9 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.hampta</groupId>
   <artifactId>hampta-shop</artifactId>
-  <version>1.5.1</version>
+  <version>1.6.0</version>
   <name>Hampta Shop</name>
-  <description>A polished Vault-powered shop and auction house for Minecraft servers.</description>
+  <description>A standalone economy shop and auction house for Minecraft servers.</description>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.release>17</maven.compiler.release>
@@ -33,12 +33,6 @@
       <groupId>org.spigotmc</groupId>
       <artifactId>spigot-api</artifactId>
       <version>1.20.4-R0.1-SNAPSHOT</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.github.MilkBowl</groupId>
-      <artifactId>VaultAPI</artifactId>
-      <version>1.7</version>
       <scope>provided</scope>
     </dependency>
     <dependency>

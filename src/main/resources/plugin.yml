@@ -2,9 +2,8 @@ name: HamptaShop
 version: ${project.version}
 main: com.hampta.shop.HamptaShopPlugin
 api-version: '1.20'
-description: A polished economy shop and player auction house.
+description: A standalone economy shop and player auction house.
 author: hamterlord66
-depend: [Vault]
 softdepend: [PlaceholderAPI, LuckPerms]
 commands:
   shop:
@@ -31,6 +30,13 @@ commands:
   anvil:
     description: Open an anvil.
     usage: /anvil
+  balance:
+    description: Check your Hampta Shop economy balance.
+    usage: /balance [player]
+    aliases: [bal]
+  pay:
+    description: Pay another online player from your balance.
+    usage: /pay <player> <amount>
 permissions:
   hamptashop.use:
     description: Use the shop and auction house.
@@ -41,6 +47,15 @@ permissions:
   hamptashop.auction:
     description: Create and manage auction listings.
     default: true
+  hamptashop.pay:
+    description: Pay another online player.
+    default: true
+  hamptashop.economy.view-others:
+    description: View other players' economy balances.
+    default: op
+  hamptashop.economy.admin:
+    description: Set, add, or remove player balances.
+    default: op
   hamptashop.admin:
     description: Full Hampta Shop administration access.
     default: op

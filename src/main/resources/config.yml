@@ -1,8 +1,12 @@
 settings:
   prefix: "&8[&bHampta Shop&8] &7"
-  currency-fallback: "$"
+  currency-symbol: "$"
   shop-title: "&8Shop"
   auction-title: "&8Auction House"
+
+economy:
+  starting-balance: 0.0
+  maximum-balance: 2147483647.0
 
 pricing:
   shop-preset: normal

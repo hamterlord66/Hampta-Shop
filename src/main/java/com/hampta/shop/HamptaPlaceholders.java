@@ -33,7 +33,7 @@ final class HamptaPlaceholders extends PlaceholderExpansion {
     @Override
     public String onRequest(OfflinePlayer player, String parameters) {
         if (parameters.equalsIgnoreCase("balance") && player != null) {
-            return plugin.getEconomy().format(plugin.getEconomy().getBalance(player));
+            return plugin.formatCurrency(plugin.getBalance(player.getUniqueId()));
         }
         return null;
     }
