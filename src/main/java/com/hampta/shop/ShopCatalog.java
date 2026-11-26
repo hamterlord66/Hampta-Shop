@@ -153,7 +153,6 @@ final class ShopCatalog {
             }
         }
         yaml.save(categoryFile(id));
-        ConfigurationSection items = catalog.getConfigurationSection("shop.items");
         if (items != null) {
             for (String itemId : items.getKeys(false)) {
                 if (!id.equals(catalog.getString("shop.items." + itemId + ".category"))) {
