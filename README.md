@@ -14,7 +14,7 @@ The auction house uses a local SQLite database. Its JDBC driver is bundled into 
 
 ## Install
 
-1. Download `Hampta-Shop-1.1.0.jar` from the GitHub Actions **hampta-shop** artifact or build it locally.
+1. Download `Hampta-Shop-1.2.0.jar` from the GitHub Actions **hampta-shop** artifact or build it locally.
 2. Put the JAR in the server's `plugins` folder.
 3. Ensure Vault and an economy provider are installed, then restart the server.
 4. Configure shop items and auction fees in `plugins/HamptaShop/config.yml`.
@@ -25,7 +25,7 @@ The auction house uses a local SQLite database. Its JDBC driver is bundled into 
 mvn --batch-mode clean verify
 ```
 
-The distributable JAR is `target/Hampta-Shop-1.1.0.jar`. The GitHub Actions workflow at `.github/workflows/build.yml` builds the plugin on pushes, pull requests, tags, or manual dispatch and uploads the JAR as an artifact.
+The distributable JAR is `target/Hampta-Shop-1.2.0.jar`. The GitHub Actions workflow at `.github/workflows/build.yml` builds the plugin on pushes, pull requests, tags, or manual dispatch and uploads the JAR as an artifact.
 
 ## Commands
 
@@ -70,9 +70,11 @@ The distributable JAR is `target/Hampta-Shop-1.1.0.jar`. The GitHub Actions work
 | `/hs admin additem <id> <category> <buy> <sell>` | Add the held item to the shop |
 | `/hs admin setprice <id> <buy> <sell>` | Update an item's prices |
 
-Shop GUI: left-click buys one item, shift-left-click buys 16, right-click sells one, and shift-right-click sells all matching items. Built-in presets are `balanced`, `hardcore`, and `generous`. Applying a preset replaces shop categories/items and auction settings, while leaving other settings untouched; the previous `config.yml` is backed up under `plugins/HamptaShop/backups/`.
+Shop GUI: left-click buys one item, shift-left-click buys 16, right-click sells one, and shift-right-click sells all matching items. Categories are **Blocks**, **Misc (Items)**, **Spawners**, **PVP**, **Food**, **Mob drops**, and **Potions**. The starter catalog includes configurable examples for each; potions preserve their configured potion effects, and spawn eggs have distinct entries. The generic monster-spawner item does not assign a mob type: that behavior depends on the server. Built-in presets are `balanced`, `hardcore`, and `generous`. Applying a preset replaces shop categories/items and auction settings, while leaving other settings untouched; the previous `config.yml` is backed up under `plugins/HamptaShop/backups/`.
 
 The category browser and item shop menus both display the player's live Vault balance.
+
+On upgrade from older versions, the plugin replaces the previous built-in categories and shop items once with this catalog. It backs up both the old config and preset files under `plugins/HamptaShop/backups/` first. Later restarts will not overwrite shop edits.
 
 Price modifiers can give permission groups discounts and improved sale prices. Assign the configured permission to a LuckPerms group (for example, `/lp group vip permission set hamptashop.discount.vip true`). Only the highest applicable discount and highest sell bonus are used; they do not stack. Discounts are capped at 90% and sell bonuses at 100%.
 

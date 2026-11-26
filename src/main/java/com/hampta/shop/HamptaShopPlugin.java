@@ -24,8 +24,11 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.potion.PotionData;
+import org.bukkit.potion.PotionType;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.StringUtil;
 
@@ -70,6 +73,7 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
         messages = YamlConfiguration.loadConfiguration(new java.io.File(getDataFolder(), "messages.yml"));
         presetsFile = new File(getDataFolder(), "presets.yml");
         presets = YamlConfiguration.loadConfiguration(presetsFile);
+        migrateShopCatalog();
         playerDataFile = new File(getDataFolder(), "players.yml");
         playerData = YamlConfiguration.loadConfiguration(playerDataFile);
         setupEconomy();
@@ -129,6 +133,93 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
             return;
         }
         economy = registration.getProvider();
+    }
+
+    private void migrateShopCatalog() {
+        if (getConfig().getInt("shop.catalog-version", 0) >= 2) {
+            return;
+        }
+        File backupFolder = new File(getDataFolder(), "backups");
+        if (!backupFolder.exists() && !backupFolder.mkdirs()) {
+            getLogger().severe("Could not create a backup directory; shop catalog migration was skipped.");
+            return;
+        }
+        String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss-SSS"));
+        File configBackup = new File(backupFolder, "config-before-catalog-v2-" + timestamp + ".yml");
+        File presetBackup = new File(backupFolder, "presets-before-catalog-v2-" + timestamp + ".yml");
+        try {
+            getConfig().save(configBackup);
+            presets.save(presetBackup);
+        } catch (IOException exception) {
+            getLogger().log(Level.SEVERE, "Could not back up shop settings; catalog migration was skipped.", exception);
+            return;
+        }
+        try (var stream = getResource("config.yml")) {
+            if (stream == null) {
+                throw new IOException("Bundled default config.yml was not found.");
+            }
+            YamlConfiguration defaults = YamlConfiguration.loadConfiguration(
+                    new java.io.InputStreamReader(stream, java.nio.charset.StandardCharsets.UTF_8));
+            replaceConfigSection(defaults, "shop.categories");
+            replaceConfigSection(defaults, "shop.items");
+            getConfig().set("shop.catalog-version", 2);
+            saveConfig();
+            migrateBuiltInPresets();
+            getLogger().info("Migrated the server shop to catalog version 2. Previous settings were backed up to "
+                    + backupFolder.getName() + ".");
+        } catch (IOException exception) {
+            getLogger().log(Level.SEVERE, "Could not migrate the shop catalog.", exception);
+        }
+    }
+
+    private void replaceConfigSection(YamlConfiguration source, String path) {
+        ConfigurationSection section = source.getConfigurationSection(path);
+        if (section == null) {
+            throw new IllegalStateException("Bundled default catalog is missing " + path);
+        }
+        getConfig().set(path, null);
+        for (Map.Entry<String, Object> entry : section.getValues(true).entrySet()) {
+            if (!(entry.getValue() instanceof ConfigurationSection)) {
+                getConfig().set(path + "." + entry.getKey(), entry.getValue());
+            }
+        }
+    }
+
+    private void migrateBuiltInPresets() throws IOException {
+        ConfigurationSection customPresets = presets.getConfigurationSection("custom-presets");
+        YamlConfiguration defaults;
+        try (var stream = getResource("presets.yml")) {
+            if (stream == null) {
+                throw new IOException("Bundled default presets.yml was not found.");
+            }
+            defaults = YamlConfiguration.loadConfiguration(
+                    new java.io.InputStreamReader(stream, java.nio.charset.StandardCharsets.UTF_8));
+        }
+        presets.set("presets", null);
+        ConfigurationSection builtIns = defaults.getConfigurationSection("presets");
+        if (builtIns != null) {
+            for (Map.Entry<String, Object> entry : builtIns.getValues(true).entrySet()) {
+                if (!(entry.getValue() instanceof ConfigurationSection)) {
+                    presets.set("presets." + entry.getKey(), entry.getValue());
+                }
+            }
+        }
+        ConfigurationSection catalogs = defaults.getConfigurationSection("catalogs");
+        if (catalogs != null) {
+            for (Map.Entry<String, Object> entry : catalogs.getValues(true).entrySet()) {
+                if (!(entry.getValue() instanceof ConfigurationSection)) {
+                    presets.set("catalogs." + entry.getKey(), entry.getValue());
+                }
+            }
+        }
+        if (customPresets != null) {
+            for (Map.Entry<String, Object> entry : customPresets.getValues(true).entrySet()) {
+                if (!(entry.getValue() instanceof ConfigurationSection)) {
+                    presets.set("custom-presets." + entry.getKey(), entry.getValue());
+                }
+            }
+        }
+        presets.save(presetsFile);
     }
 
     Economy getEconomy() {
@@ -489,9 +580,11 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
             send(sender, "preset-not-found", "preset", id);
             return true;
         }
-        if (preset.getConfigurationSection("shop.categories") == null
-                || preset.getConfigurationSection("shop.items") == null
-                || preset.getConfigurationSection("auction") == null) {
+        ConfigurationSection presetShop = resolvePresetShop(preset);
+        if (presetShop == null || presetShop.getConfigurationSection("categories") == null
+                || presetShop.getConfigurationSection("items") == null
+                || preset.getConfigurationSection("auction") == null
+                || !validPresetPriceMultipliers(preset, presetShop)) {
             send(sender, "preset-invalid", "preset", id);
             return true;
         }
@@ -556,12 +649,58 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
             send(sender, "preset-backup-error");
             return;
         }
-        copyPresetSection(preset, "shop");
+        ConfigurationSection shop = resolvePresetShop(preset);
+        copyPresetSection(shop, "categories", "shop.categories");
+        copyPresetSection(shop, "items", "shop.items");
+        applyPresetPriceMultipliers(preset);
         copyPresetSection(preset, "auction");
         saveConfig();
         reloadConfig();
         send(sender, "preset-applied", "preset", id, "backup", backup.getName());
         getLogger().info(sender.getName() + " applied preset '" + id + "'. Backup: " + backup.getName());
+    }
+
+    private ConfigurationSection resolvePresetShop(ConfigurationSection preset) {
+        ConfigurationSection direct = preset.getConfigurationSection("shop");
+        if (direct != null) {
+            return direct;
+        }
+        String catalog = preset.getString("catalog", "");
+        if (catalog.isBlank()) {
+            return null;
+        }
+        ConfigurationSection catalogDefinition = presets.getConfigurationSection("catalogs." + catalog);
+        if (catalogDefinition == null) {
+            return null;
+        }
+        if (catalogDefinition.getString("source", "").equalsIgnoreCase("defaults")) {
+            try (var stream = getResource("config.yml")) {
+                if (stream == null) {
+                    getLogger().severe("Bundled default shop catalog was not found.");
+                    return null;
+                }
+                YamlConfiguration defaults = YamlConfiguration.loadConfiguration(
+                        new java.io.InputStreamReader(stream, java.nio.charset.StandardCharsets.UTF_8));
+                return defaults.getConfigurationSection("shop");
+            } catch (IOException exception) {
+                getLogger().log(Level.SEVERE, "Could not load the bundled default shop catalog.", exception);
+                return null;
+            }
+        }
+        return catalogDefinition.getConfigurationSection("shop");
+    }
+
+    private void copyPresetSection(ConfigurationSection source, String sourcePath, String targetPath) {
+        ConfigurationSection values = source.getConfigurationSection(sourcePath);
+        if (values == null) {
+            return;
+        }
+        getConfig().set(targetPath, null);
+        for (Map.Entry<String, Object> entry : values.getValues(true).entrySet()) {
+            if (!(entry.getValue() instanceof ConfigurationSection)) {
+                getConfig().set(targetPath + "." + entry.getKey(), entry.getValue());
+            }
+        }
     }
 
     private void copyPresetSection(ConfigurationSection preset, String sectionName) {
@@ -575,6 +714,54 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
                 getConfig().set(sectionName + "." + entry.getKey(), entry.getValue());
             }
         }
+    }
+
+    private void applyPresetPriceMultipliers(ConfigurationSection preset) {
+        double buyMultiplier = preset.getDouble("buy-price-multiplier", 1.0);
+        double sellMultiplier = preset.getDouble("sell-price-multiplier", 1.0);
+        if (!Double.isFinite(buyMultiplier) || buyMultiplier < 0
+                || !Double.isFinite(sellMultiplier) || sellMultiplier < 0) {
+            throw new IllegalArgumentException("Invalid price multiplier in preset.");
+        }
+        ConfigurationSection items = getConfig().getConfigurationSection("shop.items");
+        if (items == null) {
+            return;
+        }
+        for (String id : items.getKeys(false)) {
+            String path = "shop.items." + id;
+            double buy = getConfig().getDouble(path + ".buy-price", 0) * buyMultiplier;
+            double sell = getConfig().getDouble(path + ".sell-price", 0) * sellMultiplier;
+            if (!Double.isFinite(buy) || !Double.isFinite(sell)) {
+                throw new IllegalArgumentException("Preset price multiplier exceeds supported price range.");
+            }
+            getConfig().set(path + ".buy-price", buy);
+            getConfig().set(path + ".sell-price", sell);
+        }
+    }
+
+    private boolean validPresetPriceMultipliers(ConfigurationSection preset, ConfigurationSection shop) {
+        double buyMultiplier = preset.getDouble("buy-price-multiplier", 1.0);
+        double sellMultiplier = preset.getDouble("sell-price-multiplier", 1.0);
+        if (!Double.isFinite(buyMultiplier) || buyMultiplier < 0
+                || !Double.isFinite(sellMultiplier) || sellMultiplier < 0) {
+            return false;
+        }
+        ConfigurationSection items = shop.getConfigurationSection("items");
+        if (items == null) {
+            return false;
+        }
+        for (String id : items.getKeys(false)) {
+            ConfigurationSection item = items.getConfigurationSection(id);
+            if (item == null) {
+                return false;
+            }
+            double buy = item.getDouble("buy-price", 0) * buyMultiplier;
+            double sell = item.getDouble("sell-price", 0) * sellMultiplier;
+            if (!Double.isFinite(buy) || !Double.isFinite(sell)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private void savePresets(CommandSender sender) {
@@ -1613,6 +1800,18 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
         ItemStack item = new ItemStack(material);
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
+            String potionTypeName = getConfig().getString(path + ".potion-type", "");
+            if (!potionTypeName.isBlank() && meta instanceof PotionMeta potionMeta) {
+                try {
+                    PotionType potionType = PotionType.valueOf(potionTypeName.toUpperCase(Locale.ROOT));
+                    PotionData potionData = new PotionData(potionType,
+                            getConfig().getBoolean(path + ".extended", false),
+                            getConfig().getBoolean(path + ".upgraded", false));
+                    potionMeta.setBasePotionData(potionData);
+                } catch (IllegalArgumentException exception) {
+                    getLogger().warning("Invalid potion configuration for shop item '" + id + "'.");
+                }
+            }
             meta.setDisplayName(color(getConfig().getString(path + ".name", prettify(id))));
             List<String> lore = getConfig().getStringList(path + ".lore").stream().map(this::color).toList();
             if (!lore.isEmpty()) {
@@ -1637,7 +1836,18 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
         }
         Material material = Material.matchMaterial(
                 getConfig().getString("shop.items." + id + ".material", "STONE"));
-        return material != null && candidate.getType() == material;
+        if (material == null || candidate.getType() != material) {
+            return false;
+        }
+        String potionType = getConfig().getString("shop.items." + id + ".potion-type", "");
+        if (!potionType.isBlank()) {
+            ItemMeta expectedMeta = shopItem(id).getItemMeta();
+            ItemMeta candidateMeta = candidate.getItemMeta();
+            return expectedMeta instanceof PotionMeta expectedPotion
+                    && candidateMeta instanceof PotionMeta candidatePotion
+                    && expectedPotion.getBasePotionData().equals(candidatePotion.getBasePotionData());
+        }
+        return true;
     }
 
     private double buyPrice(String id, Player player) {
