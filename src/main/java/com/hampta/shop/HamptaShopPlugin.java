@@ -15,10 +15,12 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryType;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -319,7 +321,8 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
         switch (kind) {
             case "enderchest" -> player.openInventory(player.getEnderChest());
             case "crafting" -> player.openWorkbench(player.getLocation(), true);
-            case "anvil" -> player.openAnvil(player.getLocation(), true);
+            case "anvil" -> player.openInventory(Bukkit.createInventory(null, InventoryType.ANVIL,
+                    color("&8Portable Anvil")));
             default -> throw new IllegalStateException("Unknown utility menu: " + kind);
         }
         return true;
@@ -857,7 +860,7 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
         } else if (holder.kind == MenuHolder.Kind.ITEMS && slot >= 0 && slot < PAGE_SIZE) {
             String itemId = itemAtSlot(holder, slot);
             if (itemId != null) {
-                if (event.isMiddleClick()) {
+                if (event.getClick() == ClickType.MIDDLE) {
                     toggleFavorite(player, itemId);
                 } else if (event.isLeftClick()) {
                     buyFromShop(player, itemId, event.isShiftClick() ? 16 : 1);
@@ -1425,8 +1428,8 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
 
     private java.util.Comparator<String> shopComparator(String sort, Player player) {
         return switch (sort) {
-            case "buy" -> java.util.Comparator.comparingDouble(id -> player == null ? 0 : buyPrice(id, player));
-            case "sell" -> java.util.Comparator.comparingDouble(id ->
+            case "buy" -> java.util.Comparator.<String>comparingDouble(id -> player == null ? 0 : buyPrice(id, player));
+            case "sell" -> java.util.Comparator.<String>comparingDouble(id ->
                     player == null ? 0 : sellPrice(id, player)).reversed();
             default -> java.util.Comparator.comparing(id ->
                     ChatColor.stripColor(color(getConfig().getString("shop.items." + id + ".name", prettify(id))))
