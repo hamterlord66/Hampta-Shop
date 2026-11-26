@@ -60,6 +60,7 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
     private File playerDataFile;
     private final Map<UUID, SellConfirmation> sellConfirmations = new HashMap<>();
     private final Map<UUID, AuctionBuyConfirmation> auctionBuyConfirmations = new HashMap<>();
+    private boolean invalidShopPriceMultiplierLogged;
 
     private record SellConfirmation(Map<String, Integer> amounts, boolean hotbarOnly, long expiresAt) {
     }
@@ -150,7 +151,7 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
     private boolean migrateShopCatalog() {
         boolean legacyCatalog = getConfig().isConfigurationSection("shop.categories")
                 || getConfig().isConfigurationSection("shop.items");
-        boolean updatePresets = !presets.getString("catalogs.standard.source", "").equalsIgnoreCase("defaults");
+        boolean updatePresets = presets.getInt("version", 0) < 2;
         boolean upgradeCatalog = getConfig().getInt("shop.catalog-files-version", 0)
                 < ShopCatalog.CATALOG_FILES_VERSION
                 && shopCatalog.hasCategoryFiles();
@@ -204,6 +205,7 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
                 }
             }
         }
+        presets.set("version", defaults.getInt("version", 2));
         if (customPresets != null) {
             for (Map.Entry<String, Object> entry : customPresets.getValues(true).entrySet()) {
                 if (!(entry.getValue() instanceof ConfigurationSection)) {
@@ -579,6 +581,15 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
             send(sender, "preset-not-found", "preset", id);
             return true;
         }
+        if (preset.getBoolean("price-only", false)) {
+            double multiplier = preset.getDouble("shop-price-multiplier", Double.NaN);
+            if (!Double.isFinite(multiplier) || multiplier < 0) {
+                send(sender, "preset-invalid", "preset", id);
+                return true;
+            }
+            applyShopPricePreset(sender, id, multiplier);
+            return true;
+        }
         ConfigurationSection presetShop = resolvePresetShop(preset);
         if (presetShop == null || presetShop.getConfigurationSection("categories") == null
                 || presetShop.getConfigurationSection("items") == null
@@ -592,8 +603,8 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
     }
 
     private ConfigurationSection findPreset(String id) {
-        ConfigurationSection custom = presets.getConfigurationSection("custom-presets." + id);
-        return custom != null ? custom : presets.getConfigurationSection("presets." + id);
+        ConfigurationSection builtIn = presets.getConfigurationSection("presets." + id);
+        return builtIn != null ? builtIn : presets.getConfigurationSection("custom-presets." + id);
     }
 
     private List<String> presetNames() {
@@ -601,7 +612,11 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
         for (String root : List.of("presets", "custom-presets")) {
             ConfigurationSection section = presets.getConfigurationSection(root);
             if (section != null) {
-                names.addAll(section.getKeys(false));
+                for (String id : section.getKeys(false)) {
+                    if (names.stream().noneMatch(name -> name.equalsIgnoreCase(id))) {
+                        names.add(id);
+                    }
+                }
             }
         }
         names.sort(String.CASE_INSENSITIVE_ORDER);
@@ -614,6 +629,8 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
             copyCatalogSectionToPresets("shop.categories", "custom-presets." + id + ".shop.categories");
             copyCatalogSectionToPresets("shop.items", "custom-presets." + id + ".shop.items");
             copyConfigSectionToPresets("auction", "custom-presets." + id + ".auction");
+            presets.set("custom-presets." + id + ".shop-price-multiplier",
+                    shopPriceMultiplier());
             presets.save(presetsFile);
             send(sender, "preset-saved", "preset", id);
         } catch (IOException exception) {
@@ -672,6 +689,9 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
             applyPresetPriceMultipliers(preset);
             saveShopCatalog();
             copyPresetSection(preset, "auction");
+            getConfig().set("pricing.shop-price-multiplier",
+                    preset.getDouble("shop-price-multiplier", 1.0));
+            getConfig().set("pricing.shop-preset", id);
             saveConfig();
             reloadConfig();
             send(sender, "preset-applied", "preset", id, "backup", backup.getName());
@@ -687,6 +707,42 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
                             restoreException);
                 }
             }
+            send(sender, "preset-save-error");
+        }
+    }
+
+    private void applyShopPricePreset(CommandSender sender, String id, double multiplier) {
+        File backupFolder = new File(getDataFolder(), "backups");
+        if (!backupFolder.exists() && !backupFolder.mkdirs()) {
+            getLogger().severe("Could not create the config backup directory.");
+            send(sender, "preset-backup-error");
+            return;
+        }
+        String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss-SSS"));
+        File backup = new File(backupFolder, "config-" + timestamp + ".yml");
+        try {
+            getConfig().save(backup);
+        } catch (IOException exception) {
+            getLogger().log(Level.SEVERE, "Could not back up the current config before applying a preset.",
+                    exception);
+            send(sender, "preset-backup-error");
+            return;
+        }
+
+        double previousMultiplier = getConfig().getDouble("pricing.shop-price-multiplier", 1.0);
+        String previousPreset = getConfig().getString("pricing.shop-preset", "normal");
+        getConfig().set("pricing.shop-price-multiplier", multiplier);
+        getConfig().set("pricing.shop-preset", id);
+        try {
+            getConfig().save(new File(getDataFolder(), "config.yml"));
+            reloadConfig();
+            send(sender, "preset-applied", "preset", id, "backup", backup.getName());
+            getLogger().info(sender.getName() + " applied shop price preset '" + id + "'. Backup: "
+                    + backup.getName());
+        } catch (IOException exception) {
+            getConfig().set("pricing.shop-price-multiplier", previousMultiplier);
+            getConfig().set("pricing.shop-preset", previousPreset);
+            getLogger().log(Level.SEVERE, "Could not apply shop price preset '" + id + "'.", exception);
             send(sender, "preset-save-error");
         }
     }
@@ -779,7 +835,9 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
         double buyMultiplier = preset.getDouble("buy-price-multiplier", 1.0);
         double sellMultiplier = preset.getDouble("sell-price-multiplier", 1.0);
         if (!Double.isFinite(buyMultiplier) || buyMultiplier < 0
-                || !Double.isFinite(sellMultiplier) || sellMultiplier < 0) {
+                || !Double.isFinite(sellMultiplier) || sellMultiplier < 0
+                || !Double.isFinite(preset.getDouble("shop-price-multiplier", 1.0))
+                || preset.getDouble("shop-price-multiplier", 1.0) < 0) {
             return false;
         }
         ConfigurationSection items = shop.getConfigurationSection("items");
@@ -1912,12 +1970,25 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
 
     private double buyPrice(String id, Player player) {
         double base = Math.max(0, shopConfig().getDouble("shop.items." + id + ".buy-price", 0));
-        return base * (1.0 - bestPriceModifier(player, "buy-discount-percent") / 100.0);
+        return base * shopPriceMultiplier()
+                * (1.0 - bestPriceModifier(player, "buy-discount-percent") / 100.0);
     }
 
     private double sellPrice(String id, Player player) {
         double base = Math.max(0, shopConfig().getDouble("shop.items." + id + ".sell-price", 0));
         return base * (1.0 + bestPriceModifier(player, "sell-bonus-percent") / 100.0);
+    }
+
+    private double shopPriceMultiplier() {
+        double multiplier = getConfig().getDouble("pricing.shop-price-multiplier", 1.0);
+        if (!Double.isFinite(multiplier) || multiplier < 0) {
+            if (!invalidShopPriceMultiplierLogged) {
+                getLogger().warning("Invalid pricing.shop-price-multiplier; using 1.0.");
+                invalidShopPriceMultiplierLogged = true;
+            }
+            return 1.0;
+        }
+        return multiplier;
     }
 
     private double bestPriceModifier(Player player, String modifier) {
@@ -2114,9 +2185,6 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
                 if (customPresets != null) {
                     choices.addAll(customPresets.getKeys(false));
                 }
-            } else if (args.length == 3 && args[0].equalsIgnoreCase("preset")
-                    && args[1].equalsIgnoreCase("save")) {
-                choices.addAll(List.of("survival", "creative", "hardcore", "generous"));
             } else if (args.length == 2 && args[0].equalsIgnoreCase("admin")) {
                 choices.addAll(List.of("addcategory", "additem", "setprice"));
             } else if (args.length == 3 && args[0].equalsIgnoreCase("admin")

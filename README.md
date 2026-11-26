@@ -14,7 +14,7 @@ The auction house uses a local SQLite database. Its JDBC driver is bundled into 
 
 ## Install
 
-1. Download `Hampta-Shop-1.4.0.jar` from the GitHub Actions **hampta-shop** artifact or build it locally.
+1. Download `Hampta-Shop-1.5.0.jar` from the GitHub Actions **hampta-shop** artifact or build it locally.
 2. Put the JAR in the server's `plugins` folder.
 3. Ensure Vault and an economy provider are installed, then restart the server.
 4. Configure general settings and auction fees in `plugins/HamptaShop/config.yml`. Shop categories and items are stored separately in `plugins/HamptaShop/Categories/`.
@@ -25,7 +25,7 @@ The auction house uses a local SQLite database. Its JDBC driver is bundled into 
 mvn --batch-mode clean verify
 ```
 
-The distributable JAR is `target/Hampta-Shop-1.4.0.jar`. The GitHub Actions workflow at `.github/workflows/build.yml` builds the plugin on pushes, pull requests, tags, or manual dispatch and uploads the JAR as an artifact.
+The distributable JAR is `target/Hampta-Shop-1.5.0.jar`. The GitHub Actions workflow at `.github/workflows/build.yml` builds the plugin on pushes, pull requests, tags, or manual dispatch and uploads the JAR as an artifact.
 
 ## Commands
 
@@ -89,7 +89,7 @@ The item ID is its YAML key; the category is inferred from the file name. Item f
 
 The bundled catalog contains all 1,657 non-air item IDs in Minecraft Java 26.3, sorted into these categories, plus purchasable potion-effect variants (regular, splash, lingering, tipped-arrow, and available long/strong forms). Names and IDs use the [Minecraft 26.3 registry dataset](https://github.com/DallasCarraher/minecraft-data/tree/924e26d6b3bb8f97a5d1e73d6190b09879c2e1e2/data/pc/26.3); the release's new content is described in the [official Java 26.3 notes](https://www.minecraft.net/en-us/article/minecraft-java-edition-26-3). Default prices for newly added entries are starter estimates and can be changed in their category files. Technical/command/test items are included but disabled by default with `enabled: false`; enable them only if appropriate for your server. Older servers automatically skip materials or potion types their API does not support.
 
-Built-in presets are `balanced`, `hardcore`, and `generous`. Applying a preset replaces shop categories/items and auction settings, while leaving other settings untouched. The previous `config.yml` and category files are backed up under `plugins/HamptaShop/backups/`. On upgrade, the plugin adds missing 26.3 items to existing category files without overwriting existing item edits, and backs up those files before the one-time catalog upgrade.
+Built-in shop price presets are `normal` (base prices), `inflation` (4x all shop purchase prices), and `sale` (90% of all shop purchase prices). They scale prices dynamically across every category and item—including items added later—without rewriting category files or changing sell-to-server payouts. Applying one backs up `config.yml` and leaves shop edits and auction settings intact. Custom presets can still save and restore the shop catalog and auction settings. On upgrade, existing custom presets are preserved and the built-in presets are updated.
 
 The category browser and item shop menus both display the player's live Vault balance.
 

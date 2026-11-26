@@ -5,6 +5,8 @@ settings:
   auction-title: "&8Auction House"
 
 pricing:
+  shop-preset: normal
+  shop-price-multiplier: 1.0
   permission-modifiers:
     vip:
       permission: hamptashop.discount.vip

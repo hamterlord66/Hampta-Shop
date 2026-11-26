@@ -5,7 +5,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.hampta</groupId>
   <artifactId>hampta-shop</artifactId>
-  <version>1.4.0</version>
+  <version>1.5.0</version>
   <name>Hampta Shop</name>
   <description>A polished Vault-powered shop and auction house for Minecraft servers.</description>
   <properties>
