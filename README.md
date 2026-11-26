@@ -14,7 +14,7 @@ The auction house uses a local SQLite database. Its JDBC driver is bundled into 
 
 ## Install
 
-1. Download `Hampta-Shop-1.5.0.jar` from the GitHub Actions **hampta-shop** artifact or build it locally.
+1. Download `Hampta-Shop-1.5.1.jar` from the GitHub Actions **hampta-shop** artifact or build it locally.
 2. Put the JAR in the server's `plugins` folder.
 3. Ensure Vault and an economy provider are installed, then restart the server.
 4. Configure general settings and auction fees in `plugins/HamptaShop/config.yml`. Shop categories and items are stored separately in `plugins/HamptaShop/Categories/`.
@@ -25,7 +25,7 @@ The auction house uses a local SQLite database. Its JDBC driver is bundled into 
 mvn --batch-mode clean verify
 ```
 
-The distributable JAR is `target/Hampta-Shop-1.5.0.jar`. The GitHub Actions workflow at `.github/workflows/build.yml` builds the plugin on pushes, pull requests, tags, or manual dispatch and uploads the JAR as an artifact.
+The distributable JAR is `target/Hampta-Shop-1.5.1.jar`. The GitHub Actions workflow at `.github/workflows/build.yml` builds the plugin on pushes, pull requests, tags, or manual dispatch and uploads the JAR as an artifact.
 
 ## Commands
 

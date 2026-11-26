@@ -1134,6 +1134,15 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
             return;
         }
         int slot = event.getRawSlot();
+        ClickType click = event.getClick();
+        boolean shiftClick = event.isShiftClick();
+        Bukkit.getScheduler().runTask(this, () -> handleMenuClick(player, holder, slot, click, shiftClick));
+    }
+
+    private void handleMenuClick(Player player, MenuHolder holder, int slot, ClickType click, boolean shiftClick) {
+        if (!player.isOnline() || player.getOpenInventory().getTopInventory().getHolder() != holder) {
+            return;
+        }
         if (slot == 49) {
             player.closeInventory();
             return;
@@ -1168,12 +1177,12 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
         } else if (holder.kind == MenuHolder.Kind.ITEMS && slot >= 0 && slot < PAGE_SIZE) {
             String itemId = itemAtSlot(holder, slot);
             if (itemId != null) {
-                if (event.getClick() == ClickType.MIDDLE) {
+                if (click == ClickType.MIDDLE) {
                     toggleFavorite(player, itemId);
-                } else if (event.isLeftClick()) {
-                    buyFromShop(player, itemId, event.isShiftClick() ? 16 : 1);
-                } else if (event.isRightClick()) {
-                    sellMatching(player, itemId, event.isShiftClick() ? Integer.MAX_VALUE : 1);
+                } else if (click.isLeftClick()) {
+                    buyFromShop(player, itemId, shiftClick ? 16 : 1);
+                } else if (click.isRightClick()) {
+                    sellMatching(player, itemId, shiftClick ? Integer.MAX_VALUE : 1);
                 }
                 openShopItems(player, holder.category, holder.query, holder.page, holder.sort, holder.favoritesOnly);
             }
