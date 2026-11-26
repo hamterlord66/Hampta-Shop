@@ -14,7 +14,7 @@ The auction house uses a local SQLite database. Its JDBC driver is bundled into 
 
 ## Install
 
-1. Download `Hampta-Shop-1.3.0.jar` from the GitHub Actions **hampta-shop** artifact or build it locally.
+1. Download `Hampta-Shop-1.4.0.jar` from the GitHub Actions **hampta-shop** artifact or build it locally.
 2. Put the JAR in the server's `plugins` folder.
 3. Ensure Vault and an economy provider are installed, then restart the server.
 4. Configure general settings and auction fees in `plugins/HamptaShop/config.yml`. Shop categories and items are stored separately in `plugins/HamptaShop/Categories/`.
@@ -25,7 +25,7 @@ The auction house uses a local SQLite database. Its JDBC driver is bundled into 
 mvn --batch-mode clean verify
 ```
 
-The distributable JAR is `target/Hampta-Shop-1.3.0.jar`. The GitHub Actions workflow at `.github/workflows/build.yml` builds the plugin on pushes, pull requests, tags, or manual dispatch and uploads the JAR as an artifact.
+The distributable JAR is `target/Hampta-Shop-1.4.0.jar`. The GitHub Actions workflow at `.github/workflows/build.yml` builds the plugin on pushes, pull requests, tags, or manual dispatch and uploads the JAR as an artifact.
 
 ## Commands
 
@@ -87,7 +87,9 @@ items:
 
 The item ID is its YAML key; the category is inferred from the file name. Item fields such as `lore`, `potion-type`, `extended`, and `upgraded` are optional. The starter catalog includes configurable examples for each category; potions preserve their configured potion effects, and spawn eggs have distinct entries. The generic monster-spawner item does not assign a mob type: that behavior depends on the server. Use `/hamptashop reload` after manually editing category files; `/hs admin addcategory`, `/hs admin additem`, and `/hs admin setprice` write changes to those files.
 
-Built-in presets are `balanced`, `hardcore`, and `generous`. Applying a preset replaces shop categories/items and auction settings, while leaving other settings untouched. The previous `config.yml` and category files are backed up under `plugins/HamptaShop/backups/`.
+The bundled catalog contains all 1,657 non-air item IDs in Minecraft Java 26.3, sorted into these categories, plus purchasable potion-effect variants (regular, splash, lingering, tipped-arrow, and available long/strong forms). Names and IDs use the [Minecraft 26.3 registry dataset](https://github.com/DallasCarraher/minecraft-data/tree/924e26d6b3bb8f97a5d1e73d6190b09879c2e1e2/data/pc/26.3); the release's new content is described in the [official Java 26.3 notes](https://www.minecraft.net/en-us/article/minecraft-java-edition-26-3). Default prices for newly added entries are starter estimates and can be changed in their category files. Technical/command/test items are included but disabled by default with `enabled: false`; enable them only if appropriate for your server. Older servers automatically skip materials or potion types their API does not support.
+
+Built-in presets are `balanced`, `hardcore`, and `generous`. Applying a preset replaces shop categories/items and auction settings, while leaving other settings untouched. The previous `config.yml` and category files are backed up under `plugins/HamptaShop/backups/`. On upgrade, the plugin adds missing 26.3 items to existing category files without overwriting existing item edits, and backs up those files before the one-time catalog upgrade.
 
 The category browser and item shop menus both display the player's live Vault balance.
 
@@ -128,4 +130,4 @@ LuckPerms works through Bukkit's standard permission system; no LuckPerms API de
 
 `hamptashop.shop.edit` allows adding categories/items and changing prices. `hamptashop.preset.apply` allows applying presets. `hamptashop.preset.manage` allows saving/deleting custom presets. `hamptashop.admin.reload` allows reloads, and `hamptashop.admin` remains the full-access permission for compatibility.
 
-Preset definitions are in `plugins/HamptaShop/presets.yml`. Server owners can edit them there, apply them in-game, or save the active shop/auction configuration as a named custom preset. Existing inline catalogs are migrated into the category files on first startup, with backups created before migration.
+Preset definitions are in `plugins/HamptaShop/presets.yml`. Server owners can edit them there, apply them in-game, or save the active shop/auction configuration as a named custom preset. Existing inline catalogs are migrated into category files on first startup, with backups created before migration.

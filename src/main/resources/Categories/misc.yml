@@ -1,14 +1,9 @@
+---
 category:
   name: "&eMisc (Items)"
   material: CHEST
   slot: 12
-
 items:
-  torch:
-    material: TORCH
-    name: "&eTorch"
-    buy-price: 6.0
-    sell-price: 1.5
   chest:
     material: CHEST
     name: "&6Chest"
@@ -19,13 +14,1486 @@ items:
     name: "&6Crafting Table"
     buy-price: 10.0
     sell-price: 2.5
-  bucket:
-    material: BUCKET
-    name: "&fBucket"
-    buy-price: 18.0
-    sell-price: 4.5
   compass:
     material: COMPASS
     name: "&bCompass"
     buy-price: 24.0
     sell-price: 6.0
+  torch:
+    material: TORCH
+    name: "&eTorch"
+    buy-price: 6.0
+    sell-price: 1.5
+  bucket:
+    material: BUCKET
+    name: "&fBucket"
+    buy-price: 18.0
+    sell-price: 4.5
+  abandoned_camp_map:
+    material: ABANDONED_CAMP_MAP
+    name: Abandoned Camp Map
+    buy-price: 5.0
+    sell-price: 1.25
+  acacia_boat:
+    material: ACACIA_BOAT
+    name: Acacia Boat
+    buy-price: 5.0
+    sell-price: 1.25
+  acacia_chest_boat:
+    material: ACACIA_CHEST_BOAT
+    name: Acacia Boat with Chest
+    buy-price: 5.0
+    sell-price: 1.25
+  amethyst_shard:
+    material: AMETHYST_SHARD
+    name: Amethyst Shard
+    buy-price: 5.0
+    sell-price: 1.25
+  angler_pottery_sherd:
+    material: ANGLER_POTTERY_SHERD
+    name: Angler Pottery Sherd
+    buy-price: 5.0
+    sell-price: 1.25
+  archer_pottery_sherd:
+    material: ARCHER_POTTERY_SHERD
+    name: Archer Pottery Sherd
+    buy-price: 5.0
+    sell-price: 1.25
+  armor_stand:
+    material: ARMOR_STAND
+    name: Armor Stand
+    buy-price: 5.0
+    sell-price: 1.25
+  arms_up_pottery_sherd:
+    material: ARMS_UP_POTTERY_SHERD
+    name: Arms Up Pottery Sherd
+    buy-price: 5.0
+    sell-price: 1.25
+  bamboo_raft:
+    material: BAMBOO_RAFT
+    name: Bamboo Raft
+    buy-price: 5.0
+    sell-price: 1.25
+  bamboo_chest_raft:
+    material: BAMBOO_CHEST_RAFT
+    name: Bamboo Raft with Chest
+    buy-price: 5.0
+    sell-price: 1.25
+  beetroot_seeds:
+    material: BEETROOT_SEEDS
+    name: Beetroot Seeds
+    buy-price: 5.0
+    sell-price: 1.25
+  birch_boat:
+    material: BIRCH_BOAT
+    name: Birch Boat
+    buy-price: 5.0
+    sell-price: 1.25
+  birch_chest_boat:
+    material: BIRCH_CHEST_BOAT
+    name: Birch Boat with Chest
+    buy-price: 5.0
+    sell-price: 1.25
+  black_bundle:
+    material: BLACK_BUNDLE
+    name: Black Bundle
+    buy-price: 5.0
+    sell-price: 1.25
+  black_cushion:
+    material: BLACK_CUSHION
+    name: Black Cushion
+    buy-price: 5.0
+    sell-price: 1.25
+  black_dye:
+    material: BLACK_DYE
+    name: Black Dye
+    buy-price: 5.0
+    sell-price: 1.25
+  black_harness:
+    material: BLACK_HARNESS
+    name: Black Harness
+    buy-price: 5.0
+    sell-price: 1.25
+  blade_pottery_sherd:
+    material: BLADE_POTTERY_SHERD
+    name: Blade Pottery Sherd
+    buy-price: 5.0
+    sell-price: 1.25
+  blue_bundle:
+    material: BLUE_BUNDLE
+    name: Blue Bundle
+    buy-price: 5.0
+    sell-price: 1.25
+  blue_cushion:
+    material: BLUE_CUSHION
+    name: Blue Cushion
+    buy-price: 5.0
+    sell-price: 1.25
+  blue_dye:
+    material: BLUE_DYE
+    name: Blue Dye
+    buy-price: 5.0
+    sell-price: 1.25
+  blue_harness:
+    material: BLUE_HARNESS
+    name: Blue Harness
+    buy-price: 5.0
+    sell-price: 1.25
+  bolt_armor_trim_smithing_template:
+    material: BOLT_ARMOR_TRIM_SMITHING_TEMPLATE
+    name: Bolt Armor Trim
+    buy-price: 5.0
+    sell-price: 1.25
+  book:
+    material: BOOK
+    name: Book
+    buy-price: 5.0
+    sell-price: 1.25
+  writable_book:
+    material: WRITABLE_BOOK
+    name: Book and Quill
+    buy-price: 5.0
+    sell-price: 1.25
+  bordure_indented_banner_pattern:
+    material: BORDURE_INDENTED_BANNER_PATTERN
+    name: Bordure Indented Banner Pattern
+    buy-price: 5.0
+    sell-price: 1.25
+  experience_bottle:
+    material: EXPERIENCE_BOTTLE
+    name: Bottle o' Enchanting
+    buy-price: 5.0
+    sell-price: 1.25
+  bowl:
+    material: BOWL
+    name: Bowl
+    buy-price: 5.0
+    sell-price: 1.25
+  brewer_pottery_sherd:
+    material: BREWER_POTTERY_SHERD
+    name: Brewer Pottery Sherd
+    buy-price: 5.0
+    sell-price: 1.25
+  brick:
+    material: BRICK
+    name: Brick
+    buy-price: 5.0
+    sell-price: 1.25
+  brown_bundle:
+    material: BROWN_BUNDLE
+    name: Brown Bundle
+    buy-price: 5.0
+    sell-price: 1.25
+  brown_cushion:
+    material: BROWN_CUSHION
+    name: Brown Cushion
+    buy-price: 5.0
+    sell-price: 1.25
+  brown_dye:
+    material: BROWN_DYE
+    name: Brown Dye
+    buy-price: 5.0
+    sell-price: 1.25
+  brown_harness:
+    material: BROWN_HARNESS
+    name: Brown Harness
+    buy-price: 5.0
+    sell-price: 1.25
+  brush:
+    material: BRUSH
+    name: Brush
+    buy-price: 5.0
+    sell-price: 1.25
+  axolotl_bucket:
+    material: AXOLOTL_BUCKET
+    name: Bucket of Axolotl
+    buy-price: 5.0
+    sell-price: 1.25
+  tadpole_bucket:
+    material: TADPOLE_BUCKET
+    name: Bucket of Tadpole
+    buy-price: 5.0
+    sell-price: 1.25
+  bundle:
+    material: BUNDLE
+    name: Bundle
+    buy-price: 5.0
+    sell-price: 1.25
+  buried_ancient_city_map:
+    material: BURIED_ANCIENT_CITY_MAP
+    name: Buried Ancient City Map
+    buy-price: 5.0
+    sell-price: 1.25
+  buried_mineshaft_map:
+    material: BURIED_MINESHAFT_MAP
+    name: Buried Mineshaft Map
+    buy-price: 5.0
+    sell-price: 1.25
+  buried_treasure_map:
+    material: BURIED_TREASURE_MAP
+    name: Buried Treasure Map
+    buy-price: 5.0
+    sell-price: 1.25
+  buried_trial_chambers_map:
+    material: BURIED_TRIAL_CHAMBERS_MAP
+    name: Buried Trial Chambers Map
+    buy-price: 5.0
+    sell-price: 1.25
+  burn_pottery_sherd:
+    material: BURN_POTTERY_SHERD
+    name: Burn Pottery Sherd
+    buy-price: 5.0
+    sell-price: 1.25
+  carrot_on_a_stick:
+    material: CARROT_ON_A_STICK
+    name: Carrot on a Stick
+    buy-price: 5.0
+    sell-price: 1.25
+  charcoal:
+    material: CHARCOAL
+    name: Charcoal
+    buy-price: 5.0
+    sell-price: 1.25
+  cherry_boat:
+    material: CHERRY_BOAT
+    name: Cherry Boat
+    buy-price: 5.0
+    sell-price: 1.25
+  cherry_chest_boat:
+    material: CHERRY_CHEST_BOAT
+    name: Cherry Boat with Chest
+    buy-price: 5.0
+    sell-price: 1.25
+  clay_ball:
+    material: CLAY_BALL
+    name: Clay Ball
+    buy-price: 5.0
+    sell-price: 1.25
+  clock:
+    material: CLOCK
+    name: Clock
+    buy-price: 5.0
+    sell-price: 1.25
+  coal:
+    material: COAL
+    name: Coal
+    buy-price: 5.0
+    sell-price: 1.25
+  coast_armor_trim_smithing_template:
+    material: COAST_ARMOR_TRIM_SMITHING_TEMPLATE
+    name: Coast Armor Trim
+    buy-price: 5.0
+    sell-price: 1.25
+  cocoa_beans:
+    material: COCOA_BEANS
+    name: Cocoa Beans
+    buy-price: 5.0
+    sell-price: 1.25
+  copper_axe:
+    material: COPPER_AXE
+    name: Copper Axe
+    buy-price: 5.0
+    sell-price: 1.25
+  copper_hoe:
+    material: COPPER_HOE
+    name: Copper Hoe
+    buy-price: 5.0
+    sell-price: 1.25
+  copper_ingot:
+    material: COPPER_INGOT
+    name: Copper Ingot
+    buy-price: 5.0
+    sell-price: 1.25
+  copper_nugget:
+    material: COPPER_NUGGET
+    name: Copper Nugget
+    buy-price: 5.0
+    sell-price: 1.25
+  copper_pickaxe:
+    material: COPPER_PICKAXE
+    name: Copper Pickaxe
+    buy-price: 5.0
+    sell-price: 1.25
+  copper_shovel:
+    material: COPPER_SHOVEL
+    name: Copper Shovel
+    buy-price: 5.0
+    sell-price: 1.25
+  creeper_banner_pattern:
+    material: CREEPER_BANNER_PATTERN
+    name: Creeper Charge Banner Pattern
+    buy-price: 5.0
+    sell-price: 1.25
+  cyan_bundle:
+    material: CYAN_BUNDLE
+    name: Cyan Bundle
+    buy-price: 5.0
+    sell-price: 1.25
+  cyan_cushion:
+    material: CYAN_CUSHION
+    name: Cyan Cushion
+    buy-price: 5.0
+    sell-price: 1.25
+  cyan_dye:
+    material: CYAN_DYE
+    name: Cyan Dye
+    buy-price: 5.0
+    sell-price: 1.25
+  cyan_harness:
+    material: CYAN_HARNESS
+    name: Cyan Harness
+    buy-price: 5.0
+    sell-price: 1.25
+  danger_pottery_sherd:
+    material: DANGER_POTTERY_SHERD
+    name: Danger Pottery Sherd
+    buy-price: 5.0
+    sell-price: 1.25
+  dark_oak_boat:
+    material: DARK_OAK_BOAT
+    name: Dark Oak Boat
+    buy-price: 5.0
+    sell-price: 1.25
+  dark_oak_chest_boat:
+    material: DARK_OAK_CHEST_BOAT
+    name: Dark Oak Boat with Chest
+    buy-price: 5.0
+    sell-price: 1.25
+  debug_stick:
+    material: DEBUG_STICK
+    name: Debug Stick
+    buy-price: 0.0
+    sell-price: 0.0
+    enabled: false
+  desert_pyramid_map:
+    material: DESERT_PYRAMID_MAP
+    name: Desert Pyramid Map
+    buy-price: 5.0
+    sell-price: 1.25
+  desert_village_map:
+    material: DESERT_VILLAGE_MAP
+    name: Desert Village Map
+    buy-price: 5.0
+    sell-price: 1.25
+  diamond:
+    material: DIAMOND
+    name: Diamond
+    buy-price: 90.0
+    sell-price: 22.5
+  diamond_axe:
+    material: DIAMOND_AXE
+    name: Diamond Axe
+    buy-price: 5.0
+    sell-price: 1.25
+  diamond_hoe:
+    material: DIAMOND_HOE
+    name: Diamond Hoe
+    buy-price: 5.0
+    sell-price: 1.25
+  diamond_pickaxe:
+    material: DIAMOND_PICKAXE
+    name: Diamond Pickaxe
+    buy-price: 5.0
+    sell-price: 1.25
+  diamond_shovel:
+    material: DIAMOND_SHOVEL
+    name: Diamond Shovel
+    buy-price: 5.0
+    sell-price: 1.25
+  disc_fragment_5:
+    material: DISC_FRAGMENT_5
+    name: Disc Fragment
+    buy-price: 5.0
+    sell-price: 1.25
+  dune_armor_trim_smithing_template:
+    material: DUNE_ARMOR_TRIM_SMITHING_TEMPLATE
+    name: Dune Armor Trim
+    buy-price: 5.0
+    sell-price: 1.25
+  echo_shard:
+    material: ECHO_SHARD
+    name: Echo Shard
+    buy-price: 5.0
+    sell-price: 1.25
+  emerald:
+    material: EMERALD
+    name: Emerald
+    buy-price: 60.0
+    sell-price: 15.0
+  map:
+    material: MAP
+    name: Empty Map
+    buy-price: 5.0
+    sell-price: 1.25
+  enchanted_book:
+    material: ENCHANTED_BOOK
+    name: Enchanted Book
+    buy-price: 5.0
+    sell-price: 1.25
+  end_crystal:
+    material: END_CRYSTAL
+    name: End Crystal
+    buy-price: 5.0
+    sell-price: 1.25
+  explorer_pottery_sherd:
+    material: EXPLORER_POTTERY_SHERD
+    name: Explorer Pottery Sherd
+    buy-price: 5.0
+    sell-price: 1.25
+  eye_armor_trim_smithing_template:
+    material: EYE_ARMOR_TRIM_SMITHING_TEMPLATE
+    name: Eye Armor Trim
+    buy-price: 5.0
+    sell-price: 1.25
+  ender_eye:
+    material: ENDER_EYE
+    name: Eye of Ender
+    buy-price: 5.0
+    sell-price: 1.25
+  field_masoned_banner_pattern:
+    material: FIELD_MASONED_BANNER_PATTERN
+    name: Field Masoned Banner Pattern
+    buy-price: 5.0
+    sell-price: 1.25
+  fire_charge:
+    material: FIRE_CHARGE
+    name: Fire Charge
+    buy-price: 5.0
+    sell-price: 1.25
+  firework_star:
+    material: FIREWORK_STAR
+    name: Firework Star
+    buy-price: 5.0
+    sell-price: 1.25
+  fishing_rod:
+    material: FISHING_ROD
+    name: Fishing Rod
+    buy-price: 5.0
+    sell-price: 1.25
+  flint:
+    material: FLINT
+    name: Flint
+    buy-price: 5.0
+    sell-price: 1.25
+  flint_and_steel:
+    material: FLINT_AND_STEEL
+    name: Flint and Steel
+    buy-price: 5.0
+    sell-price: 1.25
+  flow_armor_trim_smithing_template:
+    material: FLOW_ARMOR_TRIM_SMITHING_TEMPLATE
+    name: Flow Armor Trim
+    buy-price: 5.0
+    sell-price: 1.25
+  flow_banner_pattern:
+    material: FLOW_BANNER_PATTERN
+    name: Flow Banner Pattern
+    buy-price: 5.0
+    sell-price: 1.25
+  flow_pottery_sherd:
+    material: FLOW_POTTERY_SHERD
+    name: Flow Pottery Sherd
+    buy-price: 5.0
+    sell-price: 1.25
+  flower_banner_pattern:
+    material: FLOWER_BANNER_PATTERN
+    name: Flower Charge Banner Pattern
+    buy-price: 5.0
+    sell-price: 1.25
+  friend_pottery_sherd:
+    material: FRIEND_POTTERY_SHERD
+    name: Friend Pottery Sherd
+    buy-price: 5.0
+    sell-price: 1.25
+  glass_bottle:
+    material: GLASS_BOTTLE
+    name: Glass Bottle
+    buy-price: 5.0
+    sell-price: 1.25
+  glistering_melon_slice:
+    material: GLISTERING_MELON_SLICE
+    name: Glistering Melon Slice
+    buy-price: 5.0
+    sell-price: 1.25
+  globe_banner_pattern:
+    material: GLOBE_BANNER_PATTERN
+    name: Globe Banner Pattern
+    buy-price: 5.0
+    sell-price: 1.25
+  glow_item_frame:
+    material: GLOW_ITEM_FRAME
+    name: Glow Item Frame
+    buy-price: 5.0
+    sell-price: 1.25
+  glowstone_dust:
+    material: GLOWSTONE_DUST
+    name: Glowstone Dust
+    buy-price: 5.0
+    sell-price: 1.25
+  gold_ingot:
+    material: GOLD_INGOT
+    name: Gold Ingot
+    buy-price: 24.0
+    sell-price: 6.0
+  gold_nugget:
+    material: GOLD_NUGGET
+    name: Gold Nugget
+    buy-price: 5.0
+    sell-price: 1.25
+  golden_axe:
+    material: GOLDEN_AXE
+    name: Golden Axe
+    buy-price: 5.0
+    sell-price: 1.25
+  golden_hoe:
+    material: GOLDEN_HOE
+    name: Golden Hoe
+    buy-price: 5.0
+    sell-price: 1.25
+  golden_pickaxe:
+    material: GOLDEN_PICKAXE
+    name: Golden Pickaxe
+    buy-price: 5.0
+    sell-price: 1.25
+  golden_shovel:
+    material: GOLDEN_SHOVEL
+    name: Golden Shovel
+    buy-price: 5.0
+    sell-price: 1.25
+  gray_bundle:
+    material: GRAY_BUNDLE
+    name: Gray Bundle
+    buy-price: 5.0
+    sell-price: 1.25
+  gray_cushion:
+    material: GRAY_CUSHION
+    name: Gray Cushion
+    buy-price: 5.0
+    sell-price: 1.25
+  gray_dye:
+    material: GRAY_DYE
+    name: Gray Dye
+    buy-price: 5.0
+    sell-price: 1.25
+  gray_harness:
+    material: GRAY_HARNESS
+    name: Gray Harness
+    buy-price: 5.0
+    sell-price: 1.25
+  green_bundle:
+    material: GREEN_BUNDLE
+    name: Green Bundle
+    buy-price: 5.0
+    sell-price: 1.25
+  green_cushion:
+    material: GREEN_CUSHION
+    name: Green Cushion
+    buy-price: 5.0
+    sell-price: 1.25
+  green_dye:
+    material: GREEN_DYE
+    name: Green Dye
+    buy-price: 5.0
+    sell-price: 1.25
+  green_harness:
+    material: GREEN_HARNESS
+    name: Green Harness
+    buy-price: 5.0
+    sell-price: 1.25
+  guster_banner_pattern:
+    material: GUSTER_BANNER_PATTERN
+    name: Guster Banner Pattern
+    buy-price: 5.0
+    sell-price: 1.25
+  guster_pottery_sherd:
+    material: GUSTER_POTTERY_SHERD
+    name: Guster Pottery Sherd
+    buy-price: 5.0
+    sell-price: 1.25
+  heart_of_the_sea:
+    material: HEART_OF_THE_SEA
+    name: Heart of the Sea
+    buy-price: 5.0
+    sell-price: 1.25
+  heart_pottery_sherd:
+    material: HEART_POTTERY_SHERD
+    name: Heart Pottery Sherd
+    buy-price: 5.0
+    sell-price: 1.25
+  heartbreak_pottery_sherd:
+    material: HEARTBREAK_POTTERY_SHERD
+    name: Heartbreak Pottery Sherd
+    buy-price: 5.0
+    sell-price: 1.25
+  honeycomb:
+    material: HONEYCOMB
+    name: Honeycomb
+    buy-price: 5.0
+    sell-price: 1.25
+  host_armor_trim_smithing_template:
+    material: HOST_ARMOR_TRIM_SMITHING_TEMPLATE
+    name: Host Armor Trim
+    buy-price: 5.0
+    sell-price: 1.25
+  howl_pottery_sherd:
+    material: HOWL_POTTERY_SHERD
+    name: Howl Pottery Sherd
+    buy-price: 5.0
+    sell-price: 1.25
+  iron_axe:
+    material: IRON_AXE
+    name: Iron Axe
+    buy-price: 5.0
+    sell-price: 1.25
+  iron_hoe:
+    material: IRON_HOE
+    name: Iron Hoe
+    buy-price: 5.0
+    sell-price: 1.25
+  iron_ingot:
+    material: IRON_INGOT
+    name: Iron Ingot
+    buy-price: 12.0
+    sell-price: 3.0
+  iron_nugget:
+    material: IRON_NUGGET
+    name: Iron Nugget
+    buy-price: 5.0
+    sell-price: 1.25
+  iron_pickaxe:
+    material: IRON_PICKAXE
+    name: Iron Pickaxe
+    buy-price: 5.0
+    sell-price: 1.25
+  iron_shovel:
+    material: IRON_SHOVEL
+    name: Iron Shovel
+    buy-price: 5.0
+    sell-price: 1.25
+  item_frame:
+    material: ITEM_FRAME
+    name: Item Frame
+    buy-price: 5.0
+    sell-price: 1.25
+  jungle_boat:
+    material: JUNGLE_BOAT
+    name: Jungle Boat
+    buy-price: 5.0
+    sell-price: 1.25
+  jungle_chest_boat:
+    material: JUNGLE_CHEST_BOAT
+    name: Jungle Boat with Chest
+    buy-price: 5.0
+    sell-price: 1.25
+  jungle_pyramid_map:
+    material: JUNGLE_PYRAMID_MAP
+    name: Jungle Pyramid Map
+    buy-price: 5.0
+    sell-price: 1.25
+  knowledge_book:
+    material: KNOWLEDGE_BOOK
+    name: Knowledge Book
+    buy-price: 0.0
+    sell-price: 0.0
+    enabled: false
+  lapis_lazuli:
+    material: LAPIS_LAZULI
+    name: Lapis Lazuli
+    buy-price: 5.0
+    sell-price: 1.25
+  lava_bucket:
+    material: LAVA_BUCKET
+    name: Lava Bucket
+    buy-price: 5.0
+    sell-price: 1.25
+  lead:
+    material: LEAD
+    name: Lead
+    buy-price: 5.0
+    sell-price: 1.25
+  light_blue_bundle:
+    material: LIGHT_BLUE_BUNDLE
+    name: Light Blue Bundle
+    buy-price: 5.0
+    sell-price: 1.25
+  light_blue_cushion:
+    material: LIGHT_BLUE_CUSHION
+    name: Light Blue Cushion
+    buy-price: 5.0
+    sell-price: 1.25
+  light_blue_dye:
+    material: LIGHT_BLUE_DYE
+    name: Light Blue Dye
+    buy-price: 5.0
+    sell-price: 1.25
+  light_blue_harness:
+    material: LIGHT_BLUE_HARNESS
+    name: Light Blue Harness
+    buy-price: 5.0
+    sell-price: 1.25
+  light_gray_bundle:
+    material: LIGHT_GRAY_BUNDLE
+    name: Light Gray Bundle
+    buy-price: 5.0
+    sell-price: 1.25
+  light_gray_cushion:
+    material: LIGHT_GRAY_CUSHION
+    name: Light Gray Cushion
+    buy-price: 5.0
+    sell-price: 1.25
+  light_gray_dye:
+    material: LIGHT_GRAY_DYE
+    name: Light Gray Dye
+    buy-price: 5.0
+    sell-price: 1.25
+  light_gray_harness:
+    material: LIGHT_GRAY_HARNESS
+    name: Light Gray Harness
+    buy-price: 5.0
+    sell-price: 1.25
+  lime_bundle:
+    material: LIME_BUNDLE
+    name: Lime Bundle
+    buy-price: 5.0
+    sell-price: 1.25
+  lime_cushion:
+    material: LIME_CUSHION
+    name: Lime Cushion
+    buy-price: 5.0
+    sell-price: 1.25
+  lime_dye:
+    material: LIME_DYE
+    name: Lime Dye
+    buy-price: 5.0
+    sell-price: 1.25
+  lime_harness:
+    material: LIME_HARNESS
+    name: Lime Harness
+    buy-price: 5.0
+    sell-price: 1.25
+  magenta_bundle:
+    material: MAGENTA_BUNDLE
+    name: Magenta Bundle
+    buy-price: 5.0
+    sell-price: 1.25
+  magenta_cushion:
+    material: MAGENTA_CUSHION
+    name: Magenta Cushion
+    buy-price: 5.0
+    sell-price: 1.25
+  magenta_dye:
+    material: MAGENTA_DYE
+    name: Magenta Dye
+    buy-price: 5.0
+    sell-price: 1.25
+  magenta_harness:
+    material: MAGENTA_HARNESS
+    name: Magenta Harness
+    buy-price: 5.0
+    sell-price: 1.25
+  mangrove_boat:
+    material: MANGROVE_BOAT
+    name: Mangrove Boat
+    buy-price: 5.0
+    sell-price: 1.25
+  mangrove_chest_boat:
+    material: MANGROVE_CHEST_BOAT
+    name: Mangrove Boat with Chest
+    buy-price: 5.0
+    sell-price: 1.25
+  filled_map:
+    material: FILLED_MAP
+    name: Map
+    buy-price: 5.0
+    sell-price: 1.25
+  melon_seeds:
+    material: MELON_SEEDS
+    name: Melon Seeds
+    buy-price: 5.0
+    sell-price: 1.25
+  milk_bucket:
+    material: MILK_BUCKET
+    name: Milk Bucket
+    buy-price: 5.0
+    sell-price: 1.25
+  minecart:
+    material: MINECART
+    name: Minecart
+    buy-price: 5.0
+    sell-price: 1.25
+  chest_minecart:
+    material: CHEST_MINECART
+    name: Minecart with Chest
+    buy-price: 5.0
+    sell-price: 1.25
+  command_block_minecart:
+    material: COMMAND_BLOCK_MINECART
+    name: Minecart with Command Block
+    buy-price: 0.0
+    sell-price: 0.0
+    enabled: false
+  furnace_minecart:
+    material: FURNACE_MINECART
+    name: Minecart with Furnace
+    buy-price: 5.0
+    sell-price: 1.25
+  hopper_minecart:
+    material: HOPPER_MINECART
+    name: Minecart with Hopper
+    buy-price: 5.0
+    sell-price: 1.25
+  tnt_minecart:
+    material: TNT_MINECART
+    name: Minecart with TNT
+    buy-price: 5.0
+    sell-price: 1.25
+  miner_pottery_sherd:
+    material: MINER_POTTERY_SHERD
+    name: Miner Pottery Sherd
+    buy-price: 5.0
+    sell-price: 1.25
+  mourner_pottery_sherd:
+    material: MOURNER_POTTERY_SHERD
+    name: Mourner Pottery Sherd
+    buy-price: 5.0
+    sell-price: 1.25
+  music_disc_11:
+    material: MUSIC_DISC_11
+    name: Music Disc
+    buy-price: 5.0
+    sell-price: 1.25
+  music_disc_13:
+    material: MUSIC_DISC_13
+    name: Music Disc
+    buy-price: 5.0
+    sell-price: 1.25
+  music_disc_5:
+    material: MUSIC_DISC_5
+    name: Music Disc
+    buy-price: 5.0
+    sell-price: 1.25
+  music_disc_blocks:
+    material: MUSIC_DISC_BLOCKS
+    name: Music Disc
+    buy-price: 5.0
+    sell-price: 1.25
+  music_disc_bounce:
+    material: MUSIC_DISC_BOUNCE
+    name: Music Disc
+    buy-price: 5.0
+    sell-price: 1.25
+  music_disc_cat:
+    material: MUSIC_DISC_CAT
+    name: Music Disc
+    buy-price: 5.0
+    sell-price: 1.25
+  music_disc_chirp:
+    material: MUSIC_DISC_CHIRP
+    name: Music Disc
+    buy-price: 5.0
+    sell-price: 1.25
+  music_disc_creator:
+    material: MUSIC_DISC_CREATOR
+    name: Music Disc
+    buy-price: 5.0
+    sell-price: 1.25
+  music_disc_creator_music_box:
+    material: MUSIC_DISC_CREATOR_MUSIC_BOX
+    name: Music Disc
+    buy-price: 5.0
+    sell-price: 1.25
+  music_disc_far:
+    material: MUSIC_DISC_FAR
+    name: Music Disc
+    buy-price: 5.0
+    sell-price: 1.25
+  music_disc_lava_chicken:
+    material: MUSIC_DISC_LAVA_CHICKEN
+    name: Music Disc
+    buy-price: 5.0
+    sell-price: 1.25
+  music_disc_mall:
+    material: MUSIC_DISC_MALL
+    name: Music Disc
+    buy-price: 5.0
+    sell-price: 1.25
+  music_disc_mellohi:
+    material: MUSIC_DISC_MELLOHI
+    name: Music Disc
+    buy-price: 5.0
+    sell-price: 1.25
+  music_disc_otherside:
+    material: MUSIC_DISC_OTHERSIDE
+    name: Music Disc
+    buy-price: 5.0
+    sell-price: 1.25
+  music_disc_pigstep:
+    material: MUSIC_DISC_PIGSTEP
+    name: Music Disc
+    buy-price: 5.0
+    sell-price: 1.25
+  music_disc_precipice:
+    material: MUSIC_DISC_PRECIPICE
+    name: Music Disc
+    buy-price: 5.0
+    sell-price: 1.25
+  music_disc_relic:
+    material: MUSIC_DISC_RELIC
+    name: Music Disc
+    buy-price: 5.0
+    sell-price: 1.25
+  music_disc_stal:
+    material: MUSIC_DISC_STAL
+    name: Music Disc
+    buy-price: 5.0
+    sell-price: 1.25
+  music_disc_strad:
+    material: MUSIC_DISC_STRAD
+    name: Music Disc
+    buy-price: 5.0
+    sell-price: 1.25
+  music_disc_tears:
+    material: MUSIC_DISC_TEARS
+    name: Music Disc
+    buy-price: 5.0
+    sell-price: 1.25
+  music_disc_wait:
+    material: MUSIC_DISC_WAIT
+    name: Music Disc
+    buy-price: 5.0
+    sell-price: 1.25
+  music_disc_ward:
+    material: MUSIC_DISC_WARD
+    name: Music Disc
+    buy-price: 5.0
+    sell-price: 1.25
+  name_tag:
+    material: NAME_TAG
+    name: Name Tag
+    buy-price: 5.0
+    sell-price: 1.25
+  nether_brick:
+    material: NETHER_BRICK
+    name: Nether Brick
+    buy-price: 5.0
+    sell-price: 1.25
+  quartz:
+    material: QUARTZ
+    name: Nether Quartz
+    buy-price: 5.0
+    sell-price: 1.25
+  netherite_axe:
+    material: NETHERITE_AXE
+    name: Netherite Axe
+    buy-price: 5.0
+    sell-price: 1.25
+  netherite_hoe:
+    material: NETHERITE_HOE
+    name: Netherite Hoe
+    buy-price: 5.0
+    sell-price: 1.25
+  netherite_ingot:
+    material: NETHERITE_INGOT
+    name: Netherite Ingot
+    buy-price: 500.0
+    sell-price: 125.0
+  netherite_pickaxe:
+    material: NETHERITE_PICKAXE
+    name: Netherite Pickaxe
+    buy-price: 5.0
+    sell-price: 1.25
+  netherite_scrap:
+    material: NETHERITE_SCRAP
+    name: Netherite Scrap
+    buy-price: 125.0
+    sell-price: 31.25
+  netherite_shovel:
+    material: NETHERITE_SHOVEL
+    name: Netherite Shovel
+    buy-price: 5.0
+    sell-price: 1.25
+  netherite_upgrade_smithing_template:
+    material: NETHERITE_UPGRADE_SMITHING_TEMPLATE
+    name: Netherite Upgrade
+    buy-price: 5.0
+    sell-price: 1.25
+  oak_boat:
+    material: OAK_BOAT
+    name: Oak Boat
+    buy-price: 5.0
+    sell-price: 1.25
+  oak_chest_boat:
+    material: OAK_CHEST_BOAT
+    name: Oak Boat with Chest
+    buy-price: 5.0
+    sell-price: 1.25
+  ocean_monument_map:
+    material: OCEAN_MONUMENT_MAP
+    name: Ocean Monument Map
+    buy-price: 5.0
+    sell-price: 1.25
+  ominous_trial_key:
+    material: OMINOUS_TRIAL_KEY
+    name: Ominous Trial Key
+    buy-price: 5.0
+    sell-price: 1.25
+  orange_bundle:
+    material: ORANGE_BUNDLE
+    name: Orange Bundle
+    buy-price: 5.0
+    sell-price: 1.25
+  orange_cushion:
+    material: ORANGE_CUSHION
+    name: Orange Cushion
+    buy-price: 5.0
+    sell-price: 1.25
+  orange_dye:
+    material: ORANGE_DYE
+    name: Orange Dye
+    buy-price: 5.0
+    sell-price: 1.25
+  orange_harness:
+    material: ORANGE_HARNESS
+    name: Orange Harness
+    buy-price: 5.0
+    sell-price: 1.25
+  painting:
+    material: PAINTING
+    name: Painting
+    buy-price: 5.0
+    sell-price: 1.25
+  pale_oak_boat:
+    material: PALE_OAK_BOAT
+    name: Pale Oak Boat
+    buy-price: 5.0
+    sell-price: 1.25
+  pale_oak_chest_boat:
+    material: PALE_OAK_CHEST_BOAT
+    name: Pale Oak Boat with Chest
+    buy-price: 5.0
+    sell-price: 1.25
+  paper:
+    material: PAPER
+    name: Paper
+    buy-price: 5.0
+    sell-price: 1.25
+  pink_bundle:
+    material: PINK_BUNDLE
+    name: Pink Bundle
+    buy-price: 5.0
+    sell-price: 1.25
+  pink_cushion:
+    material: PINK_CUSHION
+    name: Pink Cushion
+    buy-price: 5.0
+    sell-price: 1.25
+  pink_dye:
+    material: PINK_DYE
+    name: Pink Dye
+    buy-price: 5.0
+    sell-price: 1.25
+  pink_harness:
+    material: PINK_HARNESS
+    name: Pink Harness
+    buy-price: 5.0
+    sell-price: 1.25
+  pitcher_pod:
+    material: PITCHER_POD
+    name: Pitcher Pod
+    buy-price: 5.0
+    sell-price: 1.25
+  plains_village_map:
+    material: PLAINS_VILLAGE_MAP
+    name: Plains Village Map
+    buy-price: 5.0
+    sell-price: 1.25
+  plenty_pottery_sherd:
+    material: PLENTY_POTTERY_SHERD
+    name: Plenty Pottery Sherd
+    buy-price: 5.0
+    sell-price: 1.25
+  poplar_boat:
+    material: POPLAR_BOAT
+    name: Poplar Boat
+    buy-price: 5.0
+    sell-price: 1.25
+  poplar_chest_boat:
+    material: POPLAR_CHEST_BOAT
+    name: Poplar Chest Boat
+    buy-price: 5.0
+    sell-price: 1.25
+  popped_chorus_fruit:
+    material: POPPED_CHORUS_FRUIT
+    name: Popped Chorus Fruit
+    buy-price: 5.0
+    sell-price: 1.25
+  powder_snow_bucket:
+    material: POWDER_SNOW_BUCKET
+    name: Powder Snow Bucket
+    buy-price: 5.0
+    sell-price: 1.25
+  prize_pottery_sherd:
+    material: PRIZE_POTTERY_SHERD
+    name: Prize Pottery Sherd
+    buy-price: 5.0
+    sell-price: 1.25
+  pumpkin_seeds:
+    material: PUMPKIN_SEEDS
+    name: Pumpkin Seeds
+    buy-price: 5.0
+    sell-price: 1.25
+  purple_bundle:
+    material: PURPLE_BUNDLE
+    name: Purple Bundle
+    buy-price: 5.0
+    sell-price: 1.25
+  purple_cushion:
+    material: PURPLE_CUSHION
+    name: Purple Cushion
+    buy-price: 5.0
+    sell-price: 1.25
+  purple_dye:
+    material: PURPLE_DYE
+    name: Purple Dye
+    buy-price: 5.0
+    sell-price: 1.25
+  purple_harness:
+    material: PURPLE_HARNESS
+    name: Purple Harness
+    buy-price: 5.0
+    sell-price: 1.25
+  raiser_armor_trim_smithing_template:
+    material: RAISER_ARMOR_TRIM_SMITHING_TEMPLATE
+    name: Raiser Armor Trim
+    buy-price: 5.0
+    sell-price: 1.25
+  raw_copper:
+    material: RAW_COPPER
+    name: Raw Copper
+    buy-price: 5.0
+    sell-price: 1.25
+  raw_gold:
+    material: RAW_GOLD
+    name: Raw Gold
+    buy-price: 5.0
+    sell-price: 1.25
+  raw_iron:
+    material: RAW_IRON
+    name: Raw Iron
+    buy-price: 5.0
+    sell-price: 1.25
+  recovery_compass:
+    material: RECOVERY_COMPASS
+    name: Recovery Compass
+    buy-price: 5.0
+    sell-price: 1.25
+  red_bundle:
+    material: RED_BUNDLE
+    name: Red Bundle
+    buy-price: 5.0
+    sell-price: 1.25
+  red_cushion:
+    material: RED_CUSHION
+    name: Red Cushion
+    buy-price: 5.0
+    sell-price: 1.25
+  red_dye:
+    material: RED_DYE
+    name: Red Dye
+    buy-price: 5.0
+    sell-price: 1.25
+  red_harness:
+    material: RED_HARNESS
+    name: Red Harness
+    buy-price: 5.0
+    sell-price: 1.25
+  redstone:
+    material: REDSTONE
+    name: Redstone Dust
+    buy-price: 5.0
+    sell-price: 1.25
+  resin_brick:
+    material: RESIN_BRICK
+    name: Resin Brick
+    buy-price: 5.0
+    sell-price: 1.25
+  rib_armor_trim_smithing_template:
+    material: RIB_ARMOR_TRIM_SMITHING_TEMPLATE
+    name: Rib Armor Trim
+    buy-price: 5.0
+    sell-price: 1.25
+  saddle:
+    material: SADDLE
+    name: Saddle
+    buy-price: 5.0
+    sell-price: 1.25
+  savanna_village_map:
+    material: SAVANNA_VILLAGE_MAP
+    name: Savanna Village Map
+    buy-price: 5.0
+    sell-price: 1.25
+  scrape_pottery_sherd:
+    material: SCRAPE_POTTERY_SHERD
+    name: Scrape Pottery Sherd
+    buy-price: 5.0
+    sell-price: 1.25
+  sentry_armor_trim_smithing_template:
+    material: SENTRY_ARMOR_TRIM_SMITHING_TEMPLATE
+    name: Sentry Armor Trim
+    buy-price: 5.0
+    sell-price: 1.25
+  shaper_armor_trim_smithing_template:
+    material: SHAPER_ARMOR_TRIM_SMITHING_TEMPLATE
+    name: Shaper Armor Trim
+    buy-price: 5.0
+    sell-price: 1.25
+  sheaf_pottery_sherd:
+    material: SHEAF_POTTERY_SHERD
+    name: Sheaf Pottery Sherd
+    buy-price: 5.0
+    sell-price: 1.25
+  shears:
+    material: SHEARS
+    name: Shears
+    buy-price: 5.0
+    sell-price: 1.25
+  shelter_pottery_sherd:
+    material: SHELTER_POTTERY_SHERD
+    name: Shelter Pottery Sherd
+    buy-price: 5.0
+    sell-price: 1.25
+  silence_armor_trim_smithing_template:
+    material: SILENCE_ARMOR_TRIM_SMITHING_TEMPLATE
+    name: Silence Armor Trim
+    buy-price: 5.0
+    sell-price: 1.25
+  skull_banner_pattern:
+    material: SKULL_BANNER_PATTERN
+    name: Skull Charge Banner Pattern
+    buy-price: 5.0
+    sell-price: 1.25
+  skull_pottery_sherd:
+    material: SKULL_POTTERY_SHERD
+    name: Skull Pottery Sherd
+    buy-price: 5.0
+    sell-price: 1.25
+  snort_pottery_sherd:
+    material: SNORT_POTTERY_SHERD
+    name: Snort Pottery Sherd
+    buy-price: 5.0
+    sell-price: 1.25
+  snout_armor_trim_smithing_template:
+    material: SNOUT_ARMOR_TRIM_SMITHING_TEMPLATE
+    name: Snout Armor Trim
+    buy-price: 5.0
+    sell-price: 1.25
+  piglin_banner_pattern:
+    material: PIGLIN_BANNER_PATTERN
+    name: Snout Banner Pattern
+    buy-price: 5.0
+    sell-price: 1.25
+  snowball:
+    material: SNOWBALL
+    name: Snowball
+    buy-price: 5.0
+    sell-price: 1.25
+  snowy_village_map:
+    material: SNOWY_VILLAGE_MAP
+    name: Snowy Village Map
+    buy-price: 5.0
+    sell-price: 1.25
+  spire_armor_trim_smithing_template:
+    material: SPIRE_ARMOR_TRIM_SMITHING_TEMPLATE
+    name: Spire Armor Trim
+    buy-price: 5.0
+    sell-price: 1.25
+  spruce_boat:
+    material: SPRUCE_BOAT
+    name: Spruce Boat
+    buy-price: 5.0
+    sell-price: 1.25
+  spruce_chest_boat:
+    material: SPRUCE_CHEST_BOAT
+    name: Spruce Boat with Chest
+    buy-price: 5.0
+    sell-price: 1.25
+  spyglass:
+    material: SPYGLASS
+    name: Spyglass
+    buy-price: 5.0
+    sell-price: 1.25
+  stick:
+    material: STICK
+    name: Stick
+    buy-price: 5.0
+    sell-price: 1.25
+  stone_axe:
+    material: STONE_AXE
+    name: Stone Axe
+    buy-price: 5.0
+    sell-price: 1.25
+  stone_hoe:
+    material: STONE_HOE
+    name: Stone Hoe
+    buy-price: 5.0
+    sell-price: 1.25
+  stone_pickaxe:
+    material: STONE_PICKAXE
+    name: Stone Pickaxe
+    buy-price: 5.0
+    sell-price: 1.25
+  stone_shovel:
+    material: STONE_SHOVEL
+    name: Stone Shovel
+    buy-price: 5.0
+    sell-price: 1.25
+  sugar:
+    material: SUGAR
+    name: Sugar
+    buy-price: 5.0
+    sell-price: 1.25
+  swamp_hut_map:
+    material: SWAMP_HUT_MAP
+    name: Swamp Hut Map
+    buy-price: 5.0
+    sell-price: 1.25
+  taiga_village_map:
+    material: TAIGA_VILLAGE_MAP
+    name: Taiga Village Map
+    buy-price: 5.0
+    sell-price: 1.25
+  mojang_banner_pattern:
+    material: MOJANG_BANNER_PATTERN
+    name: Thing Banner Pattern
+    buy-price: 5.0
+    sell-price: 1.25
+  tide_armor_trim_smithing_template:
+    material: TIDE_ARMOR_TRIM_SMITHING_TEMPLATE
+    name: Tide Armor Trim
+    buy-price: 5.0
+    sell-price: 1.25
+  torchflower_seeds:
+    material: TORCHFLOWER_SEEDS
+    name: Torchflower Seeds
+    buy-price: 5.0
+    sell-price: 1.25
+  trial_key:
+    material: TRIAL_KEY
+    name: Trial Key
+    buy-price: 5.0
+    sell-price: 1.25
+  vex_armor_trim_smithing_template:
+    material: VEX_ARMOR_TRIM_SMITHING_TEMPLATE
+    name: Vex Armor Trim
+    buy-price: 5.0
+    sell-price: 1.25
+  ward_armor_trim_smithing_template:
+    material: WARD_ARMOR_TRIM_SMITHING_TEMPLATE
+    name: Ward Armor Trim
+    buy-price: 5.0
+    sell-price: 1.25
+  warm_ocean_ruins_map:
+    material: WARM_OCEAN_RUINS_MAP
+    name: Warm Ocean Ruins Map
+    buy-price: 5.0
+    sell-price: 1.25
+  warped_fungus_on_a_stick:
+    material: WARPED_FUNGUS_ON_A_STICK
+    name: Warped Fungus on a Stick
+    buy-price: 5.0
+    sell-price: 1.25
+  water_bucket:
+    material: WATER_BUCKET
+    name: Water Bucket
+    buy-price: 5.0
+    sell-price: 1.25
+  wayfinder_armor_trim_smithing_template:
+    material: WAYFINDER_ARMOR_TRIM_SMITHING_TEMPLATE
+    name: Wayfinder Armor Trim
+    buy-price: 5.0
+    sell-price: 1.25
+  wheat_seeds:
+    material: WHEAT_SEEDS
+    name: Wheat Seeds
+    buy-price: 5.0
+    sell-price: 1.25
+  white_bundle:
+    material: WHITE_BUNDLE
+    name: White Bundle
+    buy-price: 5.0
+    sell-price: 1.25
+  white_cushion:
+    material: WHITE_CUSHION
+    name: White Cushion
+    buy-price: 5.0
+    sell-price: 1.25
+  white_dye:
+    material: WHITE_DYE
+    name: White Dye
+    buy-price: 5.0
+    sell-price: 1.25
+  white_harness:
+    material: WHITE_HARNESS
+    name: White Harness
+    buy-price: 5.0
+    sell-price: 1.25
+  wild_armor_trim_smithing_template:
+    material: WILD_ARMOR_TRIM_SMITHING_TEMPLATE
+    name: Wild Armor Trim
+    buy-price: 5.0
+    sell-price: 1.25
+  wolf_armor:
+    material: WOLF_ARMOR
+    name: Wolf Armor
+    buy-price: 5.0
+    sell-price: 1.25
+  wooden_axe:
+    material: WOODEN_AXE
+    name: Wooden Axe
+    buy-price: 5.0
+    sell-price: 1.25
+  wooden_hoe:
+    material: WOODEN_HOE
+    name: Wooden Hoe
+    buy-price: 5.0
+    sell-price: 1.25
+  wooden_pickaxe:
+    material: WOODEN_PICKAXE
+    name: Wooden Pickaxe
+    buy-price: 5.0
+    sell-price: 1.25
+  wooden_shovel:
+    material: WOODEN_SHOVEL
+    name: Wooden Shovel
+    buy-price: 5.0
+    sell-price: 1.25
+  woodland_mansion_map:
+    material: WOODLAND_MANSION_MAP
+    name: Woodland Mansion Map
+    buy-price: 5.0
+    sell-price: 1.25
+  written_book:
+    material: WRITTEN_BOOK
+    name: Written Book
+    buy-price: 5.0
+    sell-price: 1.25
+  yellow_bundle:
+    material: YELLOW_BUNDLE
+    name: Yellow Bundle
+    buy-price: 5.0
+    sell-price: 1.25
+  yellow_cushion:
+    material: YELLOW_CUSHION
+    name: Yellow Cushion
+    buy-price: 5.0
+    sell-price: 1.25
+  yellow_dye:
+    material: YELLOW_DYE
+    name: Yellow Dye
+    buy-price: 5.0
+    sell-price: 1.25
+  yellow_harness:
+    material: YELLOW_HARNESS
+    name: Yellow Harness
+    buy-price: 5.0
+    sell-price: 1.25

@@ -4,9 +4,6 @@ settings:
   shop-title: "&8Shop"
   auction-title: "&8Auction House"
 
-shop:
-  catalog-version: 3
-
 pricing:
   permission-modifiers:
     vip:

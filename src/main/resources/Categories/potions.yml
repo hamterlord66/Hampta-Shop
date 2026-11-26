@@ -1,9 +1,16 @@
+---
 category:
   name: "&dPotions"
   material: POTION
   slot: 23
-
 items:
+  fire_resistance_potion:
+    material: POTION
+    potion-type: FIRE_RESISTANCE
+    extended: true
+    name: "&6Potion of Fire Resistance"
+    buy-price: 120.0
+    sell-price: 30.0
   speed_potion:
     material: POTION
     potion-type: SPEED
@@ -22,10 +29,1124 @@ items:
     name: "&dPotion of Healing"
     buy-price: 90.0
     sell-price: 22.5
-  fire_resistance_potion:
+  tipped_arrow_fire_resistance:
+    material: TIPPED_ARROW
+    name: Arrow of Fire Resistance
+    potion-type: FIRE_RESISTANCE
+    buy-price: 2.0
+    sell-price: 0.5
+  tipped_arrow_harming:
+    material: TIPPED_ARROW
+    name: Arrow of Harming
+    potion-type: HARMING
+    buy-price: 2.0
+    sell-price: 0.5
+  tipped_arrow_healing:
+    material: TIPPED_ARROW
+    name: Arrow of Healing
+    potion-type: HEALING
+    buy-price: 2.0
+    sell-price: 0.5
+  tipped_arrow_infestation:
+    material: TIPPED_ARROW
+    name: Arrow of Infestation
+    potion-type: INFESTED
+    buy-price: 2.0
+    sell-price: 0.5
+  tipped_arrow_invisibility:
+    material: TIPPED_ARROW
+    name: Arrow of Invisibility
+    potion-type: INVISIBILITY
+    buy-price: 2.0
+    sell-price: 0.5
+  tipped_arrow_leaping:
+    material: TIPPED_ARROW
+    name: Arrow of Leaping
+    potion-type: LEAPING
+    buy-price: 2.0
+    sell-price: 0.5
+  tipped_arrow_night_vision:
+    material: TIPPED_ARROW
+    name: Arrow of Night Vision
+    potion-type: NIGHT_VISION
+    buy-price: 2.0
+    sell-price: 0.5
+  tipped_arrow_oozing:
+    material: TIPPED_ARROW
+    name: Arrow of Oozing
+    potion-type: OOZING
+    buy-price: 2.0
+    sell-price: 0.5
+  tipped_arrow_poison:
+    material: TIPPED_ARROW
+    name: Arrow of Poison
+    potion-type: POISON
+    buy-price: 2.0
+    sell-price: 0.5
+  tipped_arrow_regeneration:
+    material: TIPPED_ARROW
+    name: Arrow of Regeneration
+    potion-type: REGENERATION
+    buy-price: 2.0
+    sell-price: 0.5
+  tipped_arrow_slow_falling:
+    material: TIPPED_ARROW
+    name: Arrow of Slow Falling
+    potion-type: SLOW_FALLING
+    buy-price: 2.0
+    sell-price: 0.5
+  tipped_arrow_slowness:
+    material: TIPPED_ARROW
+    name: Arrow of Slowness
+    potion-type: SLOWNESS
+    buy-price: 2.0
+    sell-price: 0.5
+  tipped_arrow_strength:
+    material: TIPPED_ARROW
+    name: Arrow of Strength
+    potion-type: STRENGTH
+    buy-price: 2.0
+    sell-price: 0.5
+  tipped_arrow_swiftness:
+    material: TIPPED_ARROW
+    name: Arrow of Swiftness
+    potion-type: SWIFTNESS
+    buy-price: 2.0
+    sell-price: 0.5
+  tipped_arrow_turtle_master:
+    material: TIPPED_ARROW
+    name: Arrow of Turtle Master
+    potion-type: TURTLE_MASTER
+    buy-price: 2.0
+    sell-price: 0.5
+  tipped_arrow_water_breathing:
+    material: TIPPED_ARROW
+    name: Arrow of Water Breathing
+    potion-type: WATER_BREATHING
+    buy-price: 2.0
+    sell-price: 0.5
+  tipped_arrow_weakness:
+    material: TIPPED_ARROW
+    name: Arrow of Weakness
+    potion-type: WEAKNESS
+    buy-price: 2.0
+    sell-price: 0.5
+  tipped_arrow_weaving:
+    material: TIPPED_ARROW
+    name: Arrow of Weaving
+    potion-type: WEAVING
+    buy-price: 2.0
+    sell-price: 0.5
+  tipped_arrow_wind_charged:
+    material: TIPPED_ARROW
+    name: Arrow of Wind Charged
+    potion-type: WIND_CHARGED
+    buy-price: 2.0
+    sell-price: 0.5
+  awkward_potion:
     material: POTION
+    name: Awkward Potion
+    potion-type: AWKWARD
+    buy-price: 2.0
+    sell-price: 0.5
+  lingering_potion:
+    material: LINGERING_POTION
+    name: Lingering Potion
+    buy-price: 80.0
+    sell-price: 20.0
+  lingering_potion_fire_resistance:
+    material: LINGERING_POTION
+    name: Lingering Potion of Fire Resistance
+    potion-type: FIRE_RESISTANCE
+    buy-price: 100.0
+    sell-price: 25.0
+  lingering_potion_harming:
+    material: LINGERING_POTION
+    name: Lingering Potion of Harming
+    potion-type: HARMING
+    buy-price: 100.0
+    sell-price: 25.0
+  lingering_potion_healing:
+    material: LINGERING_POTION
+    name: Lingering Potion of Healing
+    potion-type: HEALING
+    buy-price: 100.0
+    sell-price: 25.0
+  lingering_potion_infestation:
+    material: LINGERING_POTION
+    name: Lingering Potion of Infestation
+    potion-type: INFESTED
+    buy-price: 100.0
+    sell-price: 25.0
+  lingering_potion_invisibility:
+    material: LINGERING_POTION
+    name: Lingering Potion of Invisibility
+    potion-type: INVISIBILITY
+    buy-price: 100.0
+    sell-price: 25.0
+  lingering_potion_leaping:
+    material: LINGERING_POTION
+    name: Lingering Potion of Leaping
+    potion-type: LEAPING
+    buy-price: 100.0
+    sell-price: 25.0
+  lingering_potion_night_vision:
+    material: LINGERING_POTION
+    name: Lingering Potion of Night Vision
+    potion-type: NIGHT_VISION
+    buy-price: 100.0
+    sell-price: 25.0
+  lingering_potion_oozing:
+    material: LINGERING_POTION
+    name: Lingering Potion of Oozing
+    potion-type: OOZING
+    buy-price: 100.0
+    sell-price: 25.0
+  lingering_potion_poison:
+    material: LINGERING_POTION
+    name: Lingering Potion of Poison
+    potion-type: POISON
+    buy-price: 100.0
+    sell-price: 25.0
+  lingering_potion_regeneration:
+    material: LINGERING_POTION
+    name: Lingering Potion of Regeneration
+    potion-type: REGENERATION
+    buy-price: 100.0
+    sell-price: 25.0
+  lingering_potion_slow_falling:
+    material: LINGERING_POTION
+    name: Lingering Potion of Slow Falling
+    potion-type: SLOW_FALLING
+    buy-price: 100.0
+    sell-price: 25.0
+  lingering_potion_slowness:
+    material: LINGERING_POTION
+    name: Lingering Potion of Slowness
+    potion-type: SLOWNESS
+    buy-price: 100.0
+    sell-price: 25.0
+  lingering_potion_strength:
+    material: LINGERING_POTION
+    name: Lingering Potion of Strength
+    potion-type: STRENGTH
+    buy-price: 100.0
+    sell-price: 25.0
+  lingering_potion_swiftness:
+    material: LINGERING_POTION
+    name: Lingering Potion of Swiftness
+    potion-type: SWIFTNESS
+    buy-price: 100.0
+    sell-price: 25.0
+  lingering_potion_turtle_master:
+    material: LINGERING_POTION
+    name: Lingering Potion of Turtle Master
+    potion-type: TURTLE_MASTER
+    buy-price: 100.0
+    sell-price: 25.0
+  lingering_potion_water_breathing:
+    material: LINGERING_POTION
+    name: Lingering Potion of Water Breathing
+    potion-type: WATER_BREATHING
+    buy-price: 100.0
+    sell-price: 25.0
+  lingering_potion_weakness:
+    material: LINGERING_POTION
+    name: Lingering Potion of Weakness
+    potion-type: WEAKNESS
+    buy-price: 100.0
+    sell-price: 25.0
+  lingering_potion_weaving:
+    material: LINGERING_POTION
+    name: Lingering Potion of Weaving
+    potion-type: WEAVING
+    buy-price: 100.0
+    sell-price: 25.0
+  lingering_potion_wind_charged:
+    material: LINGERING_POTION
+    name: Lingering Potion of Wind Charged
+    potion-type: WIND_CHARGED
+    buy-price: 100.0
+    sell-price: 25.0
+  long_tipped_arrow_fire_resistance:
+    material: TIPPED_ARROW
+    name: Long Arrow of Fire Resistance
     potion-type: FIRE_RESISTANCE
     extended: true
-    name: "&6Potion of Fire Resistance"
-    buy-price: 120.0
-    sell-price: 30.0
+    buy-price: 2.0
+    sell-price: 0.5
+  long_tipped_arrow_invisibility:
+    material: TIPPED_ARROW
+    name: Long Arrow of Invisibility
+    potion-type: INVISIBILITY
+    extended: true
+    buy-price: 2.0
+    sell-price: 0.5
+  long_tipped_arrow_leaping:
+    material: TIPPED_ARROW
+    name: Long Arrow of Leaping
+    potion-type: LEAPING
+    extended: true
+    buy-price: 2.0
+    sell-price: 0.5
+  long_tipped_arrow_night_vision:
+    material: TIPPED_ARROW
+    name: Long Arrow of Night Vision
+    potion-type: NIGHT_VISION
+    extended: true
+    buy-price: 2.0
+    sell-price: 0.5
+  long_tipped_arrow_poison:
+    material: TIPPED_ARROW
+    name: Long Arrow of Poison
+    potion-type: POISON
+    extended: true
+    buy-price: 2.0
+    sell-price: 0.5
+  long_tipped_arrow_regeneration:
+    material: TIPPED_ARROW
+    name: Long Arrow of Regeneration
+    potion-type: REGENERATION
+    extended: true
+    buy-price: 2.0
+    sell-price: 0.5
+  long_tipped_arrow_slow_falling:
+    material: TIPPED_ARROW
+    name: Long Arrow of Slow Falling
+    potion-type: SLOW_FALLING
+    extended: true
+    buy-price: 2.0
+    sell-price: 0.5
+  long_tipped_arrow_slowness:
+    material: TIPPED_ARROW
+    name: Long Arrow of Slowness
+    potion-type: SLOWNESS
+    extended: true
+    buy-price: 2.0
+    sell-price: 0.5
+  long_tipped_arrow_strength:
+    material: TIPPED_ARROW
+    name: Long Arrow of Strength
+    potion-type: STRENGTH
+    extended: true
+    buy-price: 2.0
+    sell-price: 0.5
+  long_tipped_arrow_swiftness:
+    material: TIPPED_ARROW
+    name: Long Arrow of Swiftness
+    potion-type: SWIFTNESS
+    extended: true
+    buy-price: 2.0
+    sell-price: 0.5
+  long_tipped_arrow_turtle_master:
+    material: TIPPED_ARROW
+    name: Long Arrow of Turtle Master
+    potion-type: TURTLE_MASTER
+    extended: true
+    buy-price: 2.0
+    sell-price: 0.5
+  long_tipped_arrow_water_breathing:
+    material: TIPPED_ARROW
+    name: Long Arrow of Water Breathing
+    potion-type: WATER_BREATHING
+    extended: true
+    buy-price: 2.0
+    sell-price: 0.5
+  long_tipped_arrow_weakness:
+    material: TIPPED_ARROW
+    name: Long Arrow of Weakness
+    potion-type: WEAKNESS
+    extended: true
+    buy-price: 2.0
+    sell-price: 0.5
+  long_lingering_potion_fire_resistance:
+    material: LINGERING_POTION
+    name: Long Lingering Potion of Fire Resistance
+    potion-type: FIRE_RESISTANCE
+    extended: true
+    buy-price: 100.0
+    sell-price: 25.0
+  long_lingering_potion_invisibility:
+    material: LINGERING_POTION
+    name: Long Lingering Potion of Invisibility
+    potion-type: INVISIBILITY
+    extended: true
+    buy-price: 100.0
+    sell-price: 25.0
+  long_lingering_potion_leaping:
+    material: LINGERING_POTION
+    name: Long Lingering Potion of Leaping
+    potion-type: LEAPING
+    extended: true
+    buy-price: 100.0
+    sell-price: 25.0
+  long_lingering_potion_night_vision:
+    material: LINGERING_POTION
+    name: Long Lingering Potion of Night Vision
+    potion-type: NIGHT_VISION
+    extended: true
+    buy-price: 100.0
+    sell-price: 25.0
+  long_lingering_potion_poison:
+    material: LINGERING_POTION
+    name: Long Lingering Potion of Poison
+    potion-type: POISON
+    extended: true
+    buy-price: 100.0
+    sell-price: 25.0
+  long_lingering_potion_regeneration:
+    material: LINGERING_POTION
+    name: Long Lingering Potion of Regeneration
+    potion-type: REGENERATION
+    extended: true
+    buy-price: 100.0
+    sell-price: 25.0
+  long_lingering_potion_slow_falling:
+    material: LINGERING_POTION
+    name: Long Lingering Potion of Slow Falling
+    potion-type: SLOW_FALLING
+    extended: true
+    buy-price: 100.0
+    sell-price: 25.0
+  long_lingering_potion_slowness:
+    material: LINGERING_POTION
+    name: Long Lingering Potion of Slowness
+    potion-type: SLOWNESS
+    extended: true
+    buy-price: 100.0
+    sell-price: 25.0
+  long_lingering_potion_strength:
+    material: LINGERING_POTION
+    name: Long Lingering Potion of Strength
+    potion-type: STRENGTH
+    extended: true
+    buy-price: 100.0
+    sell-price: 25.0
+  long_lingering_potion_swiftness:
+    material: LINGERING_POTION
+    name: Long Lingering Potion of Swiftness
+    potion-type: SWIFTNESS
+    extended: true
+    buy-price: 100.0
+    sell-price: 25.0
+  long_lingering_potion_turtle_master:
+    material: LINGERING_POTION
+    name: Long Lingering Potion of Turtle Master
+    potion-type: TURTLE_MASTER
+    extended: true
+    buy-price: 100.0
+    sell-price: 25.0
+  long_lingering_potion_water_breathing:
+    material: LINGERING_POTION
+    name: Long Lingering Potion of Water Breathing
+    potion-type: WATER_BREATHING
+    extended: true
+    buy-price: 100.0
+    sell-price: 25.0
+  long_lingering_potion_weakness:
+    material: LINGERING_POTION
+    name: Long Lingering Potion of Weakness
+    potion-type: WEAKNESS
+    extended: true
+    buy-price: 100.0
+    sell-price: 25.0
+  long_potion_fire_resistance:
+    material: POTION
+    name: Long Potion of Fire Resistance
+    potion-type: FIRE_RESISTANCE
+    extended: true
+    buy-price: 80.0
+    sell-price: 20.0
+  long_potion_invisibility:
+    material: POTION
+    name: Long Potion of Invisibility
+    potion-type: INVISIBILITY
+    extended: true
+    buy-price: 80.0
+    sell-price: 20.0
+  long_potion_leaping:
+    material: POTION
+    name: Long Potion of Leaping
+    potion-type: LEAPING
+    extended: true
+    buy-price: 80.0
+    sell-price: 20.0
+  long_potion_night_vision:
+    material: POTION
+    name: Long Potion of Night Vision
+    potion-type: NIGHT_VISION
+    extended: true
+    buy-price: 80.0
+    sell-price: 20.0
+  long_potion_poison:
+    material: POTION
+    name: Long Potion of Poison
+    potion-type: POISON
+    extended: true
+    buy-price: 80.0
+    sell-price: 20.0
+  long_potion_regeneration:
+    material: POTION
+    name: Long Potion of Regeneration
+    potion-type: REGENERATION
+    extended: true
+    buy-price: 80.0
+    sell-price: 20.0
+  long_potion_slow_falling:
+    material: POTION
+    name: Long Potion of Slow Falling
+    potion-type: SLOW_FALLING
+    extended: true
+    buy-price: 80.0
+    sell-price: 20.0
+  long_potion_slowness:
+    material: POTION
+    name: Long Potion of Slowness
+    potion-type: SLOWNESS
+    extended: true
+    buy-price: 80.0
+    sell-price: 20.0
+  long_potion_strength:
+    material: POTION
+    name: Long Potion of Strength
+    potion-type: STRENGTH
+    extended: true
+    buy-price: 80.0
+    sell-price: 20.0
+  long_potion_swiftness:
+    material: POTION
+    name: Long Potion of Swiftness
+    potion-type: SWIFTNESS
+    extended: true
+    buy-price: 80.0
+    sell-price: 20.0
+  long_potion_turtle_master:
+    material: POTION
+    name: Long Potion of Turtle Master
+    potion-type: TURTLE_MASTER
+    extended: true
+    buy-price: 80.0
+    sell-price: 20.0
+  long_potion_water_breathing:
+    material: POTION
+    name: Long Potion of Water Breathing
+    potion-type: WATER_BREATHING
+    extended: true
+    buy-price: 80.0
+    sell-price: 20.0
+  long_potion_weakness:
+    material: POTION
+    name: Long Potion of Weakness
+    potion-type: WEAKNESS
+    extended: true
+    buy-price: 80.0
+    sell-price: 20.0
+  long_splash_potion_fire_resistance:
+    material: SPLASH_POTION
+    name: Long Splash Potion of Fire Resistance
+    potion-type: FIRE_RESISTANCE
+    extended: true
+    buy-price: 88.0
+    sell-price: 22.0
+  long_splash_potion_invisibility:
+    material: SPLASH_POTION
+    name: Long Splash Potion of Invisibility
+    potion-type: INVISIBILITY
+    extended: true
+    buy-price: 88.0
+    sell-price: 22.0
+  long_splash_potion_leaping:
+    material: SPLASH_POTION
+    name: Long Splash Potion of Leaping
+    potion-type: LEAPING
+    extended: true
+    buy-price: 88.0
+    sell-price: 22.0
+  long_splash_potion_night_vision:
+    material: SPLASH_POTION
+    name: Long Splash Potion of Night Vision
+    potion-type: NIGHT_VISION
+    extended: true
+    buy-price: 88.0
+    sell-price: 22.0
+  long_splash_potion_poison:
+    material: SPLASH_POTION
+    name: Long Splash Potion of Poison
+    potion-type: POISON
+    extended: true
+    buy-price: 88.0
+    sell-price: 22.0
+  long_splash_potion_regeneration:
+    material: SPLASH_POTION
+    name: Long Splash Potion of Regeneration
+    potion-type: REGENERATION
+    extended: true
+    buy-price: 88.0
+    sell-price: 22.0
+  long_splash_potion_slow_falling:
+    material: SPLASH_POTION
+    name: Long Splash Potion of Slow Falling
+    potion-type: SLOW_FALLING
+    extended: true
+    buy-price: 88.0
+    sell-price: 22.0
+  long_splash_potion_slowness:
+    material: SPLASH_POTION
+    name: Long Splash Potion of Slowness
+    potion-type: SLOWNESS
+    extended: true
+    buy-price: 88.0
+    sell-price: 22.0
+  long_splash_potion_strength:
+    material: SPLASH_POTION
+    name: Long Splash Potion of Strength
+    potion-type: STRENGTH
+    extended: true
+    buy-price: 88.0
+    sell-price: 22.0
+  long_splash_potion_swiftness:
+    material: SPLASH_POTION
+    name: Long Splash Potion of Swiftness
+    potion-type: SWIFTNESS
+    extended: true
+    buy-price: 88.0
+    sell-price: 22.0
+  long_splash_potion_turtle_master:
+    material: SPLASH_POTION
+    name: Long Splash Potion of Turtle Master
+    potion-type: TURTLE_MASTER
+    extended: true
+    buy-price: 88.0
+    sell-price: 22.0
+  long_splash_potion_water_breathing:
+    material: SPLASH_POTION
+    name: Long Splash Potion of Water Breathing
+    potion-type: WATER_BREATHING
+    extended: true
+    buy-price: 88.0
+    sell-price: 22.0
+  long_splash_potion_weakness:
+    material: SPLASH_POTION
+    name: Long Splash Potion of Weakness
+    potion-type: WEAKNESS
+    extended: true
+    buy-price: 88.0
+    sell-price: 22.0
+  mundane_potion:
+    material: POTION
+    name: Mundane Potion
+    potion-type: MUNDANE
+    buy-price: 2.0
+    sell-price: 0.5
+  ominous_bottle:
+    material: OMINOUS_BOTTLE
+    name: Ominous Bottle
+    buy-price: 80.0
+    sell-price: 20.0
+  potion:
+    material: POTION
+    name: Potion
+    buy-price: 80.0
+    sell-price: 20.0
+  potion_fire_resistance:
+    material: POTION
+    name: Potion of Fire Resistance
+    potion-type: FIRE_RESISTANCE
+    buy-price: 80.0
+    sell-price: 20.0
+  potion_harming:
+    material: POTION
+    name: Potion of Harming
+    potion-type: HARMING
+    buy-price: 80.0
+    sell-price: 20.0
+  potion_healing:
+    material: POTION
+    name: Potion of Healing
+    potion-type: HEALING
+    buy-price: 80.0
+    sell-price: 20.0
+  potion_infestation:
+    material: POTION
+    name: Potion of Infestation
+    potion-type: INFESTED
+    buy-price: 80.0
+    sell-price: 20.0
+  potion_invisibility:
+    material: POTION
+    name: Potion of Invisibility
+    potion-type: INVISIBILITY
+    buy-price: 80.0
+    sell-price: 20.0
+  potion_leaping:
+    material: POTION
+    name: Potion of Leaping
+    potion-type: LEAPING
+    buy-price: 80.0
+    sell-price: 20.0
+  potion_night_vision:
+    material: POTION
+    name: Potion of Night Vision
+    potion-type: NIGHT_VISION
+    buy-price: 80.0
+    sell-price: 20.0
+  potion_oozing:
+    material: POTION
+    name: Potion of Oozing
+    potion-type: OOZING
+    buy-price: 80.0
+    sell-price: 20.0
+  potion_poison:
+    material: POTION
+    name: Potion of Poison
+    potion-type: POISON
+    buy-price: 80.0
+    sell-price: 20.0
+  potion_regeneration:
+    material: POTION
+    name: Potion of Regeneration
+    potion-type: REGENERATION
+    buy-price: 80.0
+    sell-price: 20.0
+  potion_slow_falling:
+    material: POTION
+    name: Potion of Slow Falling
+    potion-type: SLOW_FALLING
+    buy-price: 80.0
+    sell-price: 20.0
+  potion_slowness:
+    material: POTION
+    name: Potion of Slowness
+    potion-type: SLOWNESS
+    buy-price: 80.0
+    sell-price: 20.0
+  potion_strength:
+    material: POTION
+    name: Potion of Strength
+    potion-type: STRENGTH
+    buy-price: 80.0
+    sell-price: 20.0
+  potion_swiftness:
+    material: POTION
+    name: Potion of Swiftness
+    potion-type: SWIFTNESS
+    buy-price: 80.0
+    sell-price: 20.0
+  potion_turtle_master:
+    material: POTION
+    name: Potion of Turtle Master
+    potion-type: TURTLE_MASTER
+    buy-price: 80.0
+    sell-price: 20.0
+  potion_water_breathing:
+    material: POTION
+    name: Potion of Water Breathing
+    potion-type: WATER_BREATHING
+    buy-price: 80.0
+    sell-price: 20.0
+  potion_weakness:
+    material: POTION
+    name: Potion of Weakness
+    potion-type: WEAKNESS
+    buy-price: 80.0
+    sell-price: 20.0
+  potion_weaving:
+    material: POTION
+    name: Potion of Weaving
+    potion-type: WEAVING
+    buy-price: 80.0
+    sell-price: 20.0
+  potion_wind_charged:
+    material: POTION
+    name: Potion of Wind Charged
+    potion-type: WIND_CHARGED
+    buy-price: 80.0
+    sell-price: 20.0
+  splash_potion:
+    material: SPLASH_POTION
+    name: Splash Potion
+    buy-price: 80.0
+    sell-price: 20.0
+  splash_potion_fire_resistance:
+    material: SPLASH_POTION
+    name: Splash Potion of Fire Resistance
+    potion-type: FIRE_RESISTANCE
+    buy-price: 88.0
+    sell-price: 22.0
+  splash_potion_harming:
+    material: SPLASH_POTION
+    name: Splash Potion of Harming
+    potion-type: HARMING
+    buy-price: 88.0
+    sell-price: 22.0
+  splash_potion_healing:
+    material: SPLASH_POTION
+    name: Splash Potion of Healing
+    potion-type: HEALING
+    buy-price: 88.0
+    sell-price: 22.0
+  splash_potion_infestation:
+    material: SPLASH_POTION
+    name: Splash Potion of Infestation
+    potion-type: INFESTED
+    buy-price: 88.0
+    sell-price: 22.0
+  splash_potion_invisibility:
+    material: SPLASH_POTION
+    name: Splash Potion of Invisibility
+    potion-type: INVISIBILITY
+    buy-price: 88.0
+    sell-price: 22.0
+  splash_potion_leaping:
+    material: SPLASH_POTION
+    name: Splash Potion of Leaping
+    potion-type: LEAPING
+    buy-price: 88.0
+    sell-price: 22.0
+  splash_potion_night_vision:
+    material: SPLASH_POTION
+    name: Splash Potion of Night Vision
+    potion-type: NIGHT_VISION
+    buy-price: 88.0
+    sell-price: 22.0
+  splash_potion_oozing:
+    material: SPLASH_POTION
+    name: Splash Potion of Oozing
+    potion-type: OOZING
+    buy-price: 88.0
+    sell-price: 22.0
+  splash_potion_poison:
+    material: SPLASH_POTION
+    name: Splash Potion of Poison
+    potion-type: POISON
+    buy-price: 88.0
+    sell-price: 22.0
+  splash_potion_regeneration:
+    material: SPLASH_POTION
+    name: Splash Potion of Regeneration
+    potion-type: REGENERATION
+    buy-price: 88.0
+    sell-price: 22.0
+  splash_potion_slow_falling:
+    material: SPLASH_POTION
+    name: Splash Potion of Slow Falling
+    potion-type: SLOW_FALLING
+    buy-price: 88.0
+    sell-price: 22.0
+  splash_potion_slowness:
+    material: SPLASH_POTION
+    name: Splash Potion of Slowness
+    potion-type: SLOWNESS
+    buy-price: 88.0
+    sell-price: 22.0
+  splash_potion_strength:
+    material: SPLASH_POTION
+    name: Splash Potion of Strength
+    potion-type: STRENGTH
+    buy-price: 88.0
+    sell-price: 22.0
+  splash_potion_swiftness:
+    material: SPLASH_POTION
+    name: Splash Potion of Swiftness
+    potion-type: SWIFTNESS
+    buy-price: 88.0
+    sell-price: 22.0
+  splash_potion_turtle_master:
+    material: SPLASH_POTION
+    name: Splash Potion of Turtle Master
+    potion-type: TURTLE_MASTER
+    buy-price: 88.0
+    sell-price: 22.0
+  splash_potion_water_breathing:
+    material: SPLASH_POTION
+    name: Splash Potion of Water Breathing
+    potion-type: WATER_BREATHING
+    buy-price: 88.0
+    sell-price: 22.0
+  splash_potion_weakness:
+    material: SPLASH_POTION
+    name: Splash Potion of Weakness
+    potion-type: WEAKNESS
+    buy-price: 88.0
+    sell-price: 22.0
+  splash_potion_weaving:
+    material: SPLASH_POTION
+    name: Splash Potion of Weaving
+    potion-type: WEAVING
+    buy-price: 88.0
+    sell-price: 22.0
+  splash_potion_wind_charged:
+    material: SPLASH_POTION
+    name: Splash Potion of Wind Charged
+    potion-type: WIND_CHARGED
+    buy-price: 88.0
+    sell-price: 22.0
+  strong_tipped_arrow_harming:
+    material: TIPPED_ARROW
+    name: Strong Arrow of Harming
+    potion-type: HARMING
+    upgraded: true
+    buy-price: 2.0
+    sell-price: 0.5
+  strong_tipped_arrow_healing:
+    material: TIPPED_ARROW
+    name: Strong Arrow of Healing
+    potion-type: HEALING
+    upgraded: true
+    buy-price: 2.0
+    sell-price: 0.5
+  strong_tipped_arrow_leaping:
+    material: TIPPED_ARROW
+    name: Strong Arrow of Leaping
+    potion-type: LEAPING
+    upgraded: true
+    buy-price: 2.0
+    sell-price: 0.5
+  strong_tipped_arrow_poison:
+    material: TIPPED_ARROW
+    name: Strong Arrow of Poison
+    potion-type: POISON
+    upgraded: true
+    buy-price: 2.0
+    sell-price: 0.5
+  strong_tipped_arrow_regeneration:
+    material: TIPPED_ARROW
+    name: Strong Arrow of Regeneration
+    potion-type: REGENERATION
+    upgraded: true
+    buy-price: 2.0
+    sell-price: 0.5
+  strong_tipped_arrow_slowness:
+    material: TIPPED_ARROW
+    name: Strong Arrow of Slowness
+    potion-type: SLOWNESS
+    upgraded: true
+    buy-price: 2.0
+    sell-price: 0.5
+  strong_tipped_arrow_strength:
+    material: TIPPED_ARROW
+    name: Strong Arrow of Strength
+    potion-type: STRENGTH
+    upgraded: true
+    buy-price: 2.0
+    sell-price: 0.5
+  strong_tipped_arrow_swiftness:
+    material: TIPPED_ARROW
+    name: Strong Arrow of Swiftness
+    potion-type: SWIFTNESS
+    upgraded: true
+    buy-price: 2.0
+    sell-price: 0.5
+  strong_tipped_arrow_turtle_master:
+    material: TIPPED_ARROW
+    name: Strong Arrow of Turtle Master
+    potion-type: TURTLE_MASTER
+    upgraded: true
+    buy-price: 2.0
+    sell-price: 0.5
+  strong_lingering_potion_harming:
+    material: LINGERING_POTION
+    name: Strong Lingering Potion of Harming
+    potion-type: HARMING
+    upgraded: true
+    buy-price: 100.0
+    sell-price: 25.0
+  strong_lingering_potion_healing:
+    material: LINGERING_POTION
+    name: Strong Lingering Potion of Healing
+    potion-type: HEALING
+    upgraded: true
+    buy-price: 100.0
+    sell-price: 25.0
+  strong_lingering_potion_leaping:
+    material: LINGERING_POTION
+    name: Strong Lingering Potion of Leaping
+    potion-type: LEAPING
+    upgraded: true
+    buy-price: 100.0
+    sell-price: 25.0
+  strong_lingering_potion_poison:
+    material: LINGERING_POTION
+    name: Strong Lingering Potion of Poison
+    potion-type: POISON
+    upgraded: true
+    buy-price: 100.0
+    sell-price: 25.0
+  strong_lingering_potion_regeneration:
+    material: LINGERING_POTION
+    name: Strong Lingering Potion of Regeneration
+    potion-type: REGENERATION
+    upgraded: true
+    buy-price: 100.0
+    sell-price: 25.0
+  strong_lingering_potion_slowness:
+    material: LINGERING_POTION
+    name: Strong Lingering Potion of Slowness
+    potion-type: SLOWNESS
+    upgraded: true
+    buy-price: 100.0
+    sell-price: 25.0
+  strong_lingering_potion_strength:
+    material: LINGERING_POTION
+    name: Strong Lingering Potion of Strength
+    potion-type: STRENGTH
+    upgraded: true
+    buy-price: 100.0
+    sell-price: 25.0
+  strong_lingering_potion_swiftness:
+    material: LINGERING_POTION
+    name: Strong Lingering Potion of Swiftness
+    potion-type: SWIFTNESS
+    upgraded: true
+    buy-price: 100.0
+    sell-price: 25.0
+  strong_lingering_potion_turtle_master:
+    material: LINGERING_POTION
+    name: Strong Lingering Potion of Turtle Master
+    potion-type: TURTLE_MASTER
+    upgraded: true
+    buy-price: 100.0
+    sell-price: 25.0
+  strong_potion_harming:
+    material: POTION
+    name: Strong Potion of Harming
+    potion-type: HARMING
+    upgraded: true
+    buy-price: 80.0
+    sell-price: 20.0
+  strong_potion_healing:
+    material: POTION
+    name: Strong Potion of Healing
+    potion-type: HEALING
+    upgraded: true
+    buy-price: 80.0
+    sell-price: 20.0
+  strong_potion_leaping:
+    material: POTION
+    name: Strong Potion of Leaping
+    potion-type: LEAPING
+    upgraded: true
+    buy-price: 80.0
+    sell-price: 20.0
+  strong_potion_poison:
+    material: POTION
+    name: Strong Potion of Poison
+    potion-type: POISON
+    upgraded: true
+    buy-price: 80.0
+    sell-price: 20.0
+  strong_potion_regeneration:
+    material: POTION
+    name: Strong Potion of Regeneration
+    potion-type: REGENERATION
+    upgraded: true
+    buy-price: 80.0
+    sell-price: 20.0
+  strong_potion_slowness:
+    material: POTION
+    name: Strong Potion of Slowness
+    potion-type: SLOWNESS
+    upgraded: true
+    buy-price: 80.0
+    sell-price: 20.0
+  strong_potion_strength:
+    material: POTION
+    name: Strong Potion of Strength
+    potion-type: STRENGTH
+    upgraded: true
+    buy-price: 80.0
+    sell-price: 20.0
+  strong_potion_swiftness:
+    material: POTION
+    name: Strong Potion of Swiftness
+    potion-type: SWIFTNESS
+    upgraded: true
+    buy-price: 80.0
+    sell-price: 20.0
+  strong_potion_turtle_master:
+    material: POTION
+    name: Strong Potion of Turtle Master
+    potion-type: TURTLE_MASTER
+    upgraded: true
+    buy-price: 80.0
+    sell-price: 20.0
+  strong_splash_potion_harming:
+    material: SPLASH_POTION
+    name: Strong Splash Potion of Harming
+    potion-type: HARMING
+    upgraded: true
+    buy-price: 88.0
+    sell-price: 22.0
+  strong_splash_potion_healing:
+    material: SPLASH_POTION
+    name: Strong Splash Potion of Healing
+    potion-type: HEALING
+    upgraded: true
+    buy-price: 88.0
+    sell-price: 22.0
+  strong_splash_potion_leaping:
+    material: SPLASH_POTION
+    name: Strong Splash Potion of Leaping
+    potion-type: LEAPING
+    upgraded: true
+    buy-price: 88.0
+    sell-price: 22.0
+  strong_splash_potion_poison:
+    material: SPLASH_POTION
+    name: Strong Splash Potion of Poison
+    potion-type: POISON
+    upgraded: true
+    buy-price: 88.0
+    sell-price: 22.0
+  strong_splash_potion_regeneration:
+    material: SPLASH_POTION
+    name: Strong Splash Potion of Regeneration
+    potion-type: REGENERATION
+    upgraded: true
+    buy-price: 88.0
+    sell-price: 22.0
+  strong_splash_potion_slowness:
+    material: SPLASH_POTION
+    name: Strong Splash Potion of Slowness
+    potion-type: SLOWNESS
+    upgraded: true
+    buy-price: 88.0
+    sell-price: 22.0
+  strong_splash_potion_strength:
+    material: SPLASH_POTION
+    name: Strong Splash Potion of Strength
+    potion-type: STRENGTH
+    upgraded: true
+    buy-price: 88.0
+    sell-price: 22.0
+  strong_splash_potion_swiftness:
+    material: SPLASH_POTION
+    name: Strong Splash Potion of Swiftness
+    potion-type: SWIFTNESS
+    upgraded: true
+    buy-price: 88.0
+    sell-price: 22.0
+  strong_splash_potion_turtle_master:
+    material: SPLASH_POTION
+    name: Strong Splash Potion of Turtle Master
+    potion-type: TURTLE_MASTER
+    upgraded: true
+    buy-price: 88.0
+    sell-price: 22.0
+  thick_potion:
+    material: POTION
+    name: Thick Potion
+    potion-type: THICK
+    buy-price: 2.0
+    sell-price: 0.5
+  tipped_arrow:
+    material: TIPPED_ARROW
+    name: Tipped Arrow
+    buy-price: 80.0
+    sell-price: 20.0
+  water_potion:
+    material: POTION
+    name: Water Potion
+    potion-type: WATER
+    buy-price: 2.0
+    sell-price: 0.5

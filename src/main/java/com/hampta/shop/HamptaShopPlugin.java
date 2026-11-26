@@ -151,7 +151,10 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
         boolean legacyCatalog = getConfig().isConfigurationSection("shop.categories")
                 || getConfig().isConfigurationSection("shop.items");
         boolean updatePresets = !presets.getString("catalogs.standard.source", "").equalsIgnoreCase("defaults");
-        if (!legacyCatalog && !updatePresets) {
+        boolean upgradeCatalog = getConfig().getInt("shop.catalog-files-version", 0)
+                < ShopCatalog.CATALOG_FILES_VERSION
+                && shopCatalog.hasCategoryFiles();
+        if (!legacyCatalog && !updatePresets && !upgradeCatalog) {
             return true;
         }
         File backupFolder = new File(getDataFolder(), "backups");
@@ -1670,7 +1673,10 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
         if (section == null) {
             return Collections.emptyList();
         }
-        return section.getKeys(false).stream().sorted().toList();
+        return section.getKeys(false).stream()
+                .filter(id -> shopConfig().getBoolean("shop.items." + id + ".enabled", true))
+                .filter(shopCatalog::supportsItem)
+                .sorted().toList();
     }
 
     private java.util.Comparator<String> shopComparator(String sort, Player player) {
@@ -1720,11 +1726,7 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
     }
 
     private String findItemId(String value) {
-        ConfigurationSection section = shopConfig().getConfigurationSection("shop.items");
-        if (section == null) {
-            return null;
-        }
-        return section.getKeys(false).stream().filter(id -> id.equalsIgnoreCase(value)).findFirst().orElse(null);
+        return itemIds().stream().filter(id -> id.equalsIgnoreCase(value)).findFirst().orElse(null);
     }
 
     private int parseAmount(String value) {

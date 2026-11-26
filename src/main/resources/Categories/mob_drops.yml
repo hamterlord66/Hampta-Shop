@@ -1,9 +1,19 @@
+---
 category:
   name: "&2Mob drops"
   material: ROTTEN_FLESH
   slot: 21
-
 items:
+  blaze_rod:
+    material: BLAZE_ROD
+    name: "&6Blaze Rod"
+    buy-price: 30.0
+    sell-price: 7.5
+  gunpowder:
+    material: GUNPOWDER
+    name: "&7Gunpowder"
+    buy-price: 18.0
+    sell-price: 4.5
   rotten_flesh:
     material: ROTTEN_FLESH
     name: "&cRotten Flesh"
@@ -19,13 +29,228 @@ items:
     name: "&fString"
     buy-price: 8.0
     sell-price: 2.0
-  gunpowder:
-    material: GUNPOWDER
-    name: "&7Gunpowder"
-    buy-price: 18.0
-    sell-price: 4.5
-  blaze_rod:
-    material: BLAZE_ROD
-    name: "&6Blaze Rod"
-    buy-price: 30.0
-    sell-price: 7.5
+  armadillo_scute:
+    material: ARMADILLO_SCUTE
+    name: Armadillo Scute
+    buy-price: 8.0
+    sell-price: 2.0
+  blaze_powder:
+    material: BLAZE_POWDER
+    name: Blaze Powder
+    buy-price: 8.0
+    sell-price: 2.0
+  blue_egg:
+    material: BLUE_EGG
+    name: Blue Egg
+    buy-price: 8.0
+    sell-price: 2.0
+  bone_meal:
+    material: BONE_MEAL
+    name: Bone Meal
+    buy-price: 8.0
+    sell-price: 2.0
+  breeze_rod:
+    material: BREEZE_ROD
+    name: Breeze Rod
+    buy-price: 8.0
+    sell-price: 2.0
+  brown_egg:
+    material: BROWN_EGG
+    name: Brown Egg
+    buy-price: 8.0
+    sell-price: 2.0
+  sulfur_cube_bucket:
+    material: SULFUR_CUBE_BUCKET
+    name: Bucket of Sulfur Cube
+    buy-price: 8.0
+    sell-price: 2.0
+  copper_golem_statue:
+    material: COPPER_GOLEM_STATUE
+    name: Copper Golem Statue
+    buy-price: 8.0
+    sell-price: 2.0
+  creeper_head:
+    material: CREEPER_HEAD
+    name: Creeper Head
+    buy-price: 8.0
+    sell-price: 2.0
+  dragon_head:
+    material: DRAGON_HEAD
+    name: Dragon Head
+    buy-price: 8.0
+    sell-price: 2.0
+  dragon_breath:
+    material: DRAGON_BREATH
+    name: Dragon's Breath
+    buy-price: 24.0
+    sell-price: 6.0
+  egg:
+    material: EGG
+    name: Egg
+    buy-price: 8.0
+    sell-price: 2.0
+  ender_pearl:
+    material: ENDER_PEARL
+    name: Ender Pearl
+    buy-price: 8.0
+    sell-price: 2.0
+  exposed_copper_golem_statue:
+    material: EXPOSED_COPPER_GOLEM_STATUE
+    name: Exposed Copper Golem Statue
+    buy-price: 6.0
+    sell-price: 1.5
+  feather:
+    material: FEATHER
+    name: Feather
+    buy-price: 8.0
+    sell-price: 2.0
+  fermented_spider_eye:
+    material: FERMENTED_SPIDER_EYE
+    name: Fermented Spider Eye
+    buy-price: 8.0
+    sell-price: 2.0
+  ghast_tear:
+    material: GHAST_TEAR
+    name: Ghast Tear
+    buy-price: 8.0
+    sell-price: 2.0
+  glow_ink_sac:
+    material: GLOW_INK_SAC
+    name: Glow Ink Sac
+    buy-price: 8.0
+    sell-price: 2.0
+  goat_horn:
+    material: GOAT_HORN
+    name: Goat Horn
+    buy-price: 8.0
+    sell-price: 2.0
+  ink_sac:
+    material: INK_SAC
+    name: Ink Sac
+    buy-price: 8.0
+    sell-price: 2.0
+  leather:
+    material: LEATHER
+    name: Leather
+    buy-price: 8.0
+    sell-price: 2.0
+  magma_cream:
+    material: MAGMA_CREAM
+    name: Magma Cream
+    buy-price: 8.0
+    sell-price: 2.0
+  nautilus_shell:
+    material: NAUTILUS_SHELL
+    name: Nautilus Shell
+    buy-price: 8.0
+    sell-price: 2.0
+  nether_star:
+    material: NETHER_STAR
+    name: Nether Star
+    buy-price: 500.0
+    sell-price: 125.0
+  oxidized_copper_golem_statue:
+    material: OXIDIZED_COPPER_GOLEM_STATUE
+    name: Oxidized Copper Golem Statue
+    buy-price: 6.0
+    sell-price: 1.5
+  phantom_membrane:
+    material: PHANTOM_MEMBRANE
+    name: Phantom Membrane
+    buy-price: 8.0
+    sell-price: 2.0
+  piglin_head:
+    material: PIGLIN_HEAD
+    name: Piglin Head
+    buy-price: 8.0
+    sell-price: 2.0
+  player_head:
+    material: PLAYER_HEAD
+    name: Player Head
+    buy-price: 8.0
+    sell-price: 2.0
+  prismarine_crystals:
+    material: PRISMARINE_CRYSTALS
+    name: Prismarine Crystals
+    buy-price: 8.0
+    sell-price: 2.0
+  prismarine_shard:
+    material: PRISMARINE_SHARD
+    name: Prismarine Shard
+    buy-price: 8.0
+    sell-price: 2.0
+  rabbit_hide:
+    material: RABBIT_HIDE
+    name: Rabbit Hide
+    buy-price: 8.0
+    sell-price: 2.0
+  rabbit_foot:
+    material: RABBIT_FOOT
+    name: Rabbit's Foot
+    buy-price: 8.0
+    sell-price: 2.0
+  shulker_shell:
+    material: SHULKER_SHELL
+    name: Shulker Shell
+    buy-price: 40.0
+    sell-price: 10.0
+  skeleton_skull:
+    material: SKELETON_SKULL
+    name: Skeleton Skull
+    buy-price: 8.0
+    sell-price: 2.0
+  slime_ball:
+    material: SLIME_BALL
+    name: Slimeball
+    buy-price: 8.0
+    sell-price: 2.0
+  sulfur:
+    material: SULFUR
+    name: Sulfur
+    buy-price: 8.0
+    sell-price: 2.0
+  turtle_scute:
+    material: TURTLE_SCUTE
+    name: Turtle Scute
+    buy-price: 8.0
+    sell-price: 2.0
+  waxed_copper_golem_statue:
+    material: WAXED_COPPER_GOLEM_STATUE
+    name: Waxed Copper Golem Statue
+    buy-price: 6.0
+    sell-price: 1.5
+  waxed_exposed_copper_golem_statue:
+    material: WAXED_EXPOSED_COPPER_GOLEM_STATUE
+    name: Waxed Exposed Copper Golem Statue
+    buy-price: 6.0
+    sell-price: 1.5
+  waxed_oxidized_copper_golem_statue:
+    material: WAXED_OXIDIZED_COPPER_GOLEM_STATUE
+    name: Waxed Oxidized Copper Golem Statue
+    buy-price: 6.0
+    sell-price: 1.5
+  waxed_weathered_copper_golem_statue:
+    material: WAXED_WEATHERED_COPPER_GOLEM_STATUE
+    name: Waxed Weathered Copper Golem Statue
+    buy-price: 6.0
+    sell-price: 1.5
+  weathered_copper_golem_statue:
+    material: WEATHERED_COPPER_GOLEM_STATUE
+    name: Weathered Copper Golem Statue
+    buy-price: 6.0
+    sell-price: 1.5
+  wind_charge:
+    material: WIND_CHARGE
+    name: Wind Charge
+    buy-price: 8.0
+    sell-price: 2.0
+  wither_skeleton_skull:
+    material: WITHER_SKELETON_SKULL
+    name: Wither Skeleton Skull
+    buy-price: 8.0
+    sell-price: 2.0
+  zombie_head:
+    material: ZOMBIE_HEAD
+    name: Zombie Head
+    buy-price: 8.0
+    sell-price: 2.0

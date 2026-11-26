@@ -1,31 +1,326 @@
+---
 category:
   name: "&4PVP"
   material: DIAMOND_SWORD
   slot: 16
-
 items:
-  diamond_sword:
-    material: DIAMOND_SWORD
-    name: "&bDiamond Sword"
-    buy-price: 800.0
-    sell-price: 200.0
-  diamond_chestplate:
-    material: DIAMOND_CHESTPLATE
-    name: "&bDiamond Chestplate"
-    buy-price: 1600.0
-    sell-price: 400.0
   bow:
     material: BOW
     name: "&6Bow"
     buy-price: 120.0
     sell-price: 30.0
-  arrow:
-    material: ARROW
-    name: "&fArrow"
-    buy-price: 2.0
-    sell-price: 0.5
   shield:
     material: SHIELD
     name: "&7Shield"
     buy-price: 80.0
     sell-price: 20.0
+  diamond_chestplate:
+    material: DIAMOND_CHESTPLATE
+    name: "&bDiamond Chestplate"
+    buy-price: 1600.0
+    sell-price: 400.0
+  diamond_sword:
+    material: DIAMOND_SWORD
+    name: "&bDiamond Sword"
+    buy-price: 800.0
+    sell-price: 200.0
+  arrow:
+    material: ARROW
+    name: "&fArrow"
+    buy-price: 2.0
+    sell-price: 0.5
+  chainmail_boots:
+    material: CHAINMAIL_BOOTS
+    name: Chainmail Boots
+    buy-price: 49.0
+    sell-price: 12.25
+  chainmail_chestplate:
+    material: CHAINMAIL_CHESTPLATE
+    name: Chainmail Chestplate
+    buy-price: 87.5
+    sell-price: 21.88
+  chainmail_helmet:
+    material: CHAINMAIL_HELMET
+    name: Chainmail Helmet
+    buy-price: 49.0
+    sell-price: 12.25
+  chainmail_leggings:
+    material: CHAINMAIL_LEGGINGS
+    name: Chainmail Leggings
+    buy-price: 63.0
+    sell-price: 15.75
+  copper_boots:
+    material: COPPER_BOOTS
+    name: Copper Boots
+    buy-price: 77.0
+    sell-price: 19.25
+  copper_chestplate:
+    material: COPPER_CHESTPLATE
+    name: Copper Chestplate
+    buy-price: 137.5
+    sell-price: 34.38
+  copper_helmet:
+    material: COPPER_HELMET
+    name: Copper Helmet
+    buy-price: 77.0
+    sell-price: 19.25
+  copper_horse_armor:
+    material: COPPER_HORSE_ARMOR
+    name: Copper Horse Armor
+    buy-price: 55.0
+    sell-price: 13.75
+  copper_leggings:
+    material: COPPER_LEGGINGS
+    name: Copper Leggings
+    buy-price: 99.0
+    sell-price: 24.75
+  copper_nautilus_armor:
+    material: COPPER_NAUTILUS_ARMOR
+    name: Copper Nautilus Armor
+    buy-price: 55.0
+    sell-price: 13.75
+  copper_spear:
+    material: COPPER_SPEAR
+    name: Copper Spear
+    buy-price: 55.0
+    sell-price: 13.75
+  copper_sword:
+    material: COPPER_SWORD
+    name: Copper Sword
+    buy-price: 55.0
+    sell-price: 13.75
+  crossbow:
+    material: CROSSBOW
+    name: Crossbow
+    buy-price: 35.0
+    sell-price: 8.75
+  diamond_boots:
+    material: DIAMOND_BOOTS
+    name: Diamond Boots
+    buy-price: 224.0
+    sell-price: 56.0
+  diamond_helmet:
+    material: DIAMOND_HELMET
+    name: Diamond Helmet
+    buy-price: 224.0
+    sell-price: 56.0
+  diamond_horse_armor:
+    material: DIAMOND_HORSE_ARMOR
+    name: Diamond Horse Armor
+    buy-price: 160.0
+    sell-price: 40.0
+  diamond_leggings:
+    material: DIAMOND_LEGGINGS
+    name: Diamond Leggings
+    buy-price: 288.0
+    sell-price: 72.0
+  diamond_nautilus_armor:
+    material: DIAMOND_NAUTILUS_ARMOR
+    name: Diamond Nautilus Armor
+    buy-price: 160.0
+    sell-price: 40.0
+  diamond_spear:
+    material: DIAMOND_SPEAR
+    name: Diamond Spear
+    buy-price: 160.0
+    sell-price: 40.0
+  elytra:
+    material: ELYTRA
+    name: Elytra
+    buy-price: 35.0
+    sell-price: 8.75
+  firework_rocket:
+    material: FIREWORK_ROCKET
+    name: Firework Rocket
+    buy-price: 35.0
+    sell-price: 8.75
+  golden_boots:
+    material: GOLDEN_BOOTS
+    name: Golden Boots
+    buy-price: 77.0
+    sell-price: 19.25
+  golden_chestplate:
+    material: GOLDEN_CHESTPLATE
+    name: Golden Chestplate
+    buy-price: 137.5
+    sell-price: 34.38
+  golden_helmet:
+    material: GOLDEN_HELMET
+    name: Golden Helmet
+    buy-price: 77.0
+    sell-price: 19.25
+  golden_horse_armor:
+    material: GOLDEN_HORSE_ARMOR
+    name: Golden Horse Armor
+    buy-price: 55.0
+    sell-price: 13.75
+  golden_leggings:
+    material: GOLDEN_LEGGINGS
+    name: Golden Leggings
+    buy-price: 99.0
+    sell-price: 24.75
+  golden_nautilus_armor:
+    material: GOLDEN_NAUTILUS_ARMOR
+    name: Golden Nautilus Armor
+    buy-price: 55.0
+    sell-price: 13.75
+  golden_spear:
+    material: GOLDEN_SPEAR
+    name: Golden Spear
+    buy-price: 55.0
+    sell-price: 13.75
+  golden_sword:
+    material: GOLDEN_SWORD
+    name: Golden Sword
+    buy-price: 55.0
+    sell-price: 13.75
+  iron_boots:
+    material: IRON_BOOTS
+    name: Iron Boots
+    buy-price: 98.0
+    sell-price: 24.5
+  iron_chestplate:
+    material: IRON_CHESTPLATE
+    name: Iron Chestplate
+    buy-price: 175.0
+    sell-price: 43.75
+  iron_helmet:
+    material: IRON_HELMET
+    name: Iron Helmet
+    buy-price: 98.0
+    sell-price: 24.5
+  iron_horse_armor:
+    material: IRON_HORSE_ARMOR
+    name: Iron Horse Armor
+    buy-price: 70.0
+    sell-price: 17.5
+  iron_leggings:
+    material: IRON_LEGGINGS
+    name: Iron Leggings
+    buy-price: 126.0
+    sell-price: 31.5
+  iron_nautilus_armor:
+    material: IRON_NAUTILUS_ARMOR
+    name: Iron Nautilus Armor
+    buy-price: 70.0
+    sell-price: 17.5
+  iron_spear:
+    material: IRON_SPEAR
+    name: Iron Spear
+    buy-price: 70.0
+    sell-price: 17.5
+  iron_sword:
+    material: IRON_SWORD
+    name: Iron Sword
+    buy-price: 70.0
+    sell-price: 17.5
+  leather_boots:
+    material: LEATHER_BOOTS
+    name: Leather Boots
+    buy-price: 25.2
+    sell-price: 6.3
+  leather_helmet:
+    material: LEATHER_HELMET
+    name: Leather Cap
+    buy-price: 25.2
+    sell-price: 6.3
+  leather_horse_armor:
+    material: LEATHER_HORSE_ARMOR
+    name: Leather Horse Armor
+    buy-price: 18.0
+    sell-price: 4.5
+  leather_leggings:
+    material: LEATHER_LEGGINGS
+    name: Leather Pants
+    buy-price: 32.4
+    sell-price: 8.1
+  leather_chestplate:
+    material: LEATHER_CHESTPLATE
+    name: Leather Tunic
+    buy-price: 45.0
+    sell-price: 11.25
+  mace:
+    material: MACE
+    name: Mace
+    buy-price: 35.0
+    sell-price: 8.75
+  netherite_boots:
+    material: NETHERITE_BOOTS
+    name: Netherite Boots
+    buy-price: 448.0
+    sell-price: 112.0
+  netherite_chestplate:
+    material: NETHERITE_CHESTPLATE
+    name: Netherite Chestplate
+    buy-price: 800.0
+    sell-price: 200.0
+  netherite_helmet:
+    material: NETHERITE_HELMET
+    name: Netherite Helmet
+    buy-price: 448.0
+    sell-price: 112.0
+  netherite_horse_armor:
+    material: NETHERITE_HORSE_ARMOR
+    name: Netherite Horse Armor
+    buy-price: 320.0
+    sell-price: 80.0
+  netherite_leggings:
+    material: NETHERITE_LEGGINGS
+    name: Netherite Leggings
+    buy-price: 576.0
+    sell-price: 144.0
+  netherite_nautilus_armor:
+    material: NETHERITE_NAUTILUS_ARMOR
+    name: Netherite Nautilus Armor
+    buy-price: 320.0
+    sell-price: 80.0
+  netherite_spear:
+    material: NETHERITE_SPEAR
+    name: Netherite Spear
+    buy-price: 320.0
+    sell-price: 80.0
+  netherite_sword:
+    material: NETHERITE_SWORD
+    name: Netherite Sword
+    buy-price: 320.0
+    sell-price: 80.0
+  spectral_arrow:
+    material: SPECTRAL_ARROW
+    name: Spectral Arrow
+    buy-price: 35.0
+    sell-price: 8.75
+  stone_spear:
+    material: STONE_SPEAR
+    name: Stone Spear
+    buy-price: 35.0
+    sell-price: 8.75
+  stone_sword:
+    material: STONE_SWORD
+    name: Stone Sword
+    buy-price: 35.0
+    sell-price: 8.75
+  totem_of_undying:
+    material: TOTEM_OF_UNDYING
+    name: Totem of Undying
+    buy-price: 35.0
+    sell-price: 8.75
+  trident:
+    material: TRIDENT
+    name: Trident
+    buy-price: 35.0
+    sell-price: 8.75
+  turtle_helmet:
+    material: TURTLE_HELMET
+    name: Turtle Shell
+    buy-price: 49.0
+    sell-price: 12.25
+  wooden_spear:
+    material: WOODEN_SPEAR
+    name: Wooden Spear
+    buy-price: 18.0
+    sell-price: 4.5
+  wooden_sword:
+    material: WOODEN_SWORD
+    name: Wooden Sword
+    buy-price: 18.0
+    sell-price: 4.5

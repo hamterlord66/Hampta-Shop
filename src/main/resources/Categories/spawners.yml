@@ -1,29 +1,460 @@
+---
 category:
   name: "&cSpawners"
   material: SPAWNER
   slot: 14
-
 items:
-  spawner:
-    material: SPAWNER
-    name: "&cMonster Spawner"
-    lore:
-      - "&7A vanilla spawner item."
-      - "&cMob type depends on your server."
-    buy-price: 50000.0
-    sell-price: 0.0
   zombie_spawn_egg:
     material: ZOMBIE_SPAWN_EGG
     name: "&2Zombie Spawn Egg"
     buy-price: 2500.0
     sell-price: 500.0
-  skeleton_spawn_egg:
-    material: SKELETON_SPAWN_EGG
-    name: "&fSkeleton Spawn Egg"
-    buy-price: 3000.0
-    sell-price: 600.0
+  spawner:
+    material: SPAWNER
+    name: "&cMonster Spawner"
+    lore:
+    - "&7A vanilla spawner item."
+    - "&cMob type depends on your server."
+    buy-price: 50000.0
+    sell-price: 0.0
   cow_spawn_egg:
     material: COW_SPAWN_EGG
     name: "&fCow Spawn Egg"
     buy-price: 1800.0
     sell-price: 350.0
+  skeleton_spawn_egg:
+    material: SKELETON_SPAWN_EGG
+    name: "&fSkeleton Spawn Egg"
+    buy-price: 3000.0
+    sell-price: 600.0
+  allay_spawn_egg:
+    material: ALLAY_SPAWN_EGG
+    name: Allay Spawn Egg
+    buy-price: 200.0
+    sell-price: 0.0
+  armadillo_spawn_egg:
+    material: ARMADILLO_SPAWN_EGG
+    name: Armadillo Spawn Egg
+    buy-price: 200.0
+    sell-price: 0.0
+  axolotl_spawn_egg:
+    material: AXOLOTL_SPAWN_EGG
+    name: Axolotl Spawn Egg
+    buy-price: 200.0
+    sell-price: 0.0
+  bat_spawn_egg:
+    material: BAT_SPAWN_EGG
+    name: Bat Spawn Egg
+    buy-price: 200.0
+    sell-price: 0.0
+  bee_spawn_egg:
+    material: BEE_SPAWN_EGG
+    name: Bee Spawn Egg
+    buy-price: 200.0
+    sell-price: 0.0
+  blaze_spawn_egg:
+    material: BLAZE_SPAWN_EGG
+    name: Blaze Spawn Egg
+    buy-price: 200.0
+    sell-price: 0.0
+  bogged_spawn_egg:
+    material: BOGGED_SPAWN_EGG
+    name: Bogged Spawn Egg
+    buy-price: 200.0
+    sell-price: 0.0
+  breeze_spawn_egg:
+    material: BREEZE_SPAWN_EGG
+    name: Breeze Spawn Egg
+    buy-price: 200.0
+    sell-price: 0.0
+  camel_husk_spawn_egg:
+    material: CAMEL_HUSK_SPAWN_EGG
+    name: Camel Husk Spawn Egg
+    buy-price: 200.0
+    sell-price: 0.0
+  camel_spawn_egg:
+    material: CAMEL_SPAWN_EGG
+    name: Camel Spawn Egg
+    buy-price: 200.0
+    sell-price: 0.0
+  cat_spawn_egg:
+    material: CAT_SPAWN_EGG
+    name: Cat Spawn Egg
+    buy-price: 200.0
+    sell-price: 0.0
+  cave_spider_spawn_egg:
+    material: CAVE_SPIDER_SPAWN_EGG
+    name: Cave Spider Spawn Egg
+    buy-price: 200.0
+    sell-price: 0.0
+  chicken_spawn_egg:
+    material: CHICKEN_SPAWN_EGG
+    name: Chicken Spawn Egg
+    buy-price: 200.0
+    sell-price: 0.0
+  cod_spawn_egg:
+    material: COD_SPAWN_EGG
+    name: Cod Spawn Egg
+    buy-price: 200.0
+    sell-price: 0.0
+  copper_golem_spawn_egg:
+    material: COPPER_GOLEM_SPAWN_EGG
+    name: Copper Golem Spawn Egg
+    buy-price: 200.0
+    sell-price: 0.0
+  creaking_spawn_egg:
+    material: CREAKING_SPAWN_EGG
+    name: Creaking Spawn Egg
+    buy-price: 200.0
+    sell-price: 0.0
+  creeper_spawn_egg:
+    material: CREEPER_SPAWN_EGG
+    name: Creeper Spawn Egg
+    buy-price: 200.0
+    sell-price: 0.0
+  dolphin_spawn_egg:
+    material: DOLPHIN_SPAWN_EGG
+    name: Dolphin Spawn Egg
+    buy-price: 200.0
+    sell-price: 0.0
+  donkey_spawn_egg:
+    material: DONKEY_SPAWN_EGG
+    name: Donkey Spawn Egg
+    buy-price: 200.0
+    sell-price: 0.0
+  drowned_spawn_egg:
+    material: DROWNED_SPAWN_EGG
+    name: Drowned Spawn Egg
+    buy-price: 200.0
+    sell-price: 0.0
+  elder_guardian_spawn_egg:
+    material: ELDER_GUARDIAN_SPAWN_EGG
+    name: Elder Guardian Spawn Egg
+    buy-price: 200.0
+    sell-price: 0.0
+  ender_dragon_spawn_egg:
+    material: ENDER_DRAGON_SPAWN_EGG
+    name: Ender Dragon Spawn Egg
+    buy-price: 200.0
+    sell-price: 0.0
+  enderman_spawn_egg:
+    material: ENDERMAN_SPAWN_EGG
+    name: Enderman Spawn Egg
+    buy-price: 200.0
+    sell-price: 0.0
+  endermite_spawn_egg:
+    material: ENDERMITE_SPAWN_EGG
+    name: Endermite Spawn Egg
+    buy-price: 200.0
+    sell-price: 0.0
+  evoker_spawn_egg:
+    material: EVOKER_SPAWN_EGG
+    name: Evoker Spawn Egg
+    buy-price: 200.0
+    sell-price: 0.0
+  fox_spawn_egg:
+    material: FOX_SPAWN_EGG
+    name: Fox Spawn Egg
+    buy-price: 200.0
+    sell-price: 0.0
+  frog_spawn_egg:
+    material: FROG_SPAWN_EGG
+    name: Frog Spawn Egg
+    buy-price: 200.0
+    sell-price: 0.0
+  ghast_spawn_egg:
+    material: GHAST_SPAWN_EGG
+    name: Ghast Spawn Egg
+    buy-price: 200.0
+    sell-price: 0.0
+  glow_squid_spawn_egg:
+    material: GLOW_SQUID_SPAWN_EGG
+    name: Glow Squid Spawn Egg
+    buy-price: 200.0
+    sell-price: 0.0
+  goat_spawn_egg:
+    material: GOAT_SPAWN_EGG
+    name: Goat Spawn Egg
+    buy-price: 200.0
+    sell-price: 0.0
+  guardian_spawn_egg:
+    material: GUARDIAN_SPAWN_EGG
+    name: Guardian Spawn Egg
+    buy-price: 200.0
+    sell-price: 0.0
+  happy_ghast_spawn_egg:
+    material: HAPPY_GHAST_SPAWN_EGG
+    name: Happy Ghast Spawn Egg
+    buy-price: 200.0
+    sell-price: 0.0
+  hoglin_spawn_egg:
+    material: HOGLIN_SPAWN_EGG
+    name: Hoglin Spawn Egg
+    buy-price: 200.0
+    sell-price: 0.0
+  horse_spawn_egg:
+    material: HORSE_SPAWN_EGG
+    name: Horse Spawn Egg
+    buy-price: 200.0
+    sell-price: 0.0
+  husk_spawn_egg:
+    material: HUSK_SPAWN_EGG
+    name: Husk Spawn Egg
+    buy-price: 200.0
+    sell-price: 0.0
+  iron_golem_spawn_egg:
+    material: IRON_GOLEM_SPAWN_EGG
+    name: Iron Golem Spawn Egg
+    buy-price: 200.0
+    sell-price: 0.0
+  llama_spawn_egg:
+    material: LLAMA_SPAWN_EGG
+    name: Llama Spawn Egg
+    buy-price: 200.0
+    sell-price: 0.0
+  magma_cube_spawn_egg:
+    material: MAGMA_CUBE_SPAWN_EGG
+    name: Magma Cube Spawn Egg
+    buy-price: 200.0
+    sell-price: 0.0
+  mooshroom_spawn_egg:
+    material: MOOSHROOM_SPAWN_EGG
+    name: Mooshroom Spawn Egg
+    buy-price: 200.0
+    sell-price: 0.0
+  mule_spawn_egg:
+    material: MULE_SPAWN_EGG
+    name: Mule Spawn Egg
+    buy-price: 200.0
+    sell-price: 0.0
+  nautilus_spawn_egg:
+    material: NAUTILUS_SPAWN_EGG
+    name: Nautilus Spawn Egg
+    buy-price: 200.0
+    sell-price: 0.0
+  ocelot_spawn_egg:
+    material: OCELOT_SPAWN_EGG
+    name: Ocelot Spawn Egg
+    buy-price: 200.0
+    sell-price: 0.0
+  panda_spawn_egg:
+    material: PANDA_SPAWN_EGG
+    name: Panda Spawn Egg
+    buy-price: 200.0
+    sell-price: 0.0
+  parched_spawn_egg:
+    material: PARCHED_SPAWN_EGG
+    name: Parched Spawn Egg
+    buy-price: 200.0
+    sell-price: 0.0
+  parrot_spawn_egg:
+    material: PARROT_SPAWN_EGG
+    name: Parrot Spawn Egg
+    buy-price: 200.0
+    sell-price: 0.0
+  phantom_spawn_egg:
+    material: PHANTOM_SPAWN_EGG
+    name: Phantom Spawn Egg
+    buy-price: 200.0
+    sell-price: 0.0
+  pig_spawn_egg:
+    material: PIG_SPAWN_EGG
+    name: Pig Spawn Egg
+    buy-price: 200.0
+    sell-price: 0.0
+  piglin_brute_spawn_egg:
+    material: PIGLIN_BRUTE_SPAWN_EGG
+    name: Piglin Brute Spawn Egg
+    buy-price: 200.0
+    sell-price: 0.0
+  piglin_spawn_egg:
+    material: PIGLIN_SPAWN_EGG
+    name: Piglin Spawn Egg
+    buy-price: 200.0
+    sell-price: 0.0
+  pillager_spawn_egg:
+    material: PILLAGER_SPAWN_EGG
+    name: Pillager Spawn Egg
+    buy-price: 200.0
+    sell-price: 0.0
+  polar_bear_spawn_egg:
+    material: POLAR_BEAR_SPAWN_EGG
+    name: Polar Bear Spawn Egg
+    buy-price: 200.0
+    sell-price: 0.0
+  pufferfish_spawn_egg:
+    material: PUFFERFISH_SPAWN_EGG
+    name: Pufferfish Spawn Egg
+    buy-price: 200.0
+    sell-price: 0.0
+  rabbit_spawn_egg:
+    material: RABBIT_SPAWN_EGG
+    name: Rabbit Spawn Egg
+    buy-price: 200.0
+    sell-price: 0.0
+  ravager_spawn_egg:
+    material: RAVAGER_SPAWN_EGG
+    name: Ravager Spawn Egg
+    buy-price: 200.0
+    sell-price: 0.0
+  salmon_spawn_egg:
+    material: SALMON_SPAWN_EGG
+    name: Salmon Spawn Egg
+    buy-price: 200.0
+    sell-price: 0.0
+  sheep_spawn_egg:
+    material: SHEEP_SPAWN_EGG
+    name: Sheep Spawn Egg
+    buy-price: 200.0
+    sell-price: 0.0
+  shulker_spawn_egg:
+    material: SHULKER_SPAWN_EGG
+    name: Shulker Spawn Egg
+    buy-price: 200.0
+    sell-price: 0.0
+  silverfish_spawn_egg:
+    material: SILVERFISH_SPAWN_EGG
+    name: Silverfish Spawn Egg
+    buy-price: 200.0
+    sell-price: 0.0
+  skeleton_horse_spawn_egg:
+    material: SKELETON_HORSE_SPAWN_EGG
+    name: Skeleton Horse Spawn Egg
+    buy-price: 200.0
+    sell-price: 0.0
+  slime_spawn_egg:
+    material: SLIME_SPAWN_EGG
+    name: Slime Spawn Egg
+    buy-price: 200.0
+    sell-price: 0.0
+  sniffer_spawn_egg:
+    material: SNIFFER_SPAWN_EGG
+    name: Sniffer Spawn Egg
+    buy-price: 200.0
+    sell-price: 0.0
+  snow_golem_spawn_egg:
+    material: SNOW_GOLEM_SPAWN_EGG
+    name: Snow Golem Spawn Egg
+    buy-price: 200.0
+    sell-price: 0.0
+  spider_spawn_egg:
+    material: SPIDER_SPAWN_EGG
+    name: Spider Spawn Egg
+    buy-price: 200.0
+    sell-price: 0.0
+  squid_spawn_egg:
+    material: SQUID_SPAWN_EGG
+    name: Squid Spawn Egg
+    buy-price: 200.0
+    sell-price: 0.0
+  stray_spawn_egg:
+    material: STRAY_SPAWN_EGG
+    name: Stray Spawn Egg
+    buy-price: 200.0
+    sell-price: 0.0
+  strider_spawn_egg:
+    material: STRIDER_SPAWN_EGG
+    name: Strider Spawn Egg
+    buy-price: 200.0
+    sell-price: 0.0
+  sulfur_cube_spawn_egg:
+    material: SULFUR_CUBE_SPAWN_EGG
+    name: Sulfur Cube Spawn Egg
+    buy-price: 200.0
+    sell-price: 0.0
+  tadpole_spawn_egg:
+    material: TADPOLE_SPAWN_EGG
+    name: Tadpole Spawn Egg
+    buy-price: 200.0
+    sell-price: 0.0
+  trader_llama_spawn_egg:
+    material: TRADER_LLAMA_SPAWN_EGG
+    name: Trader Llama Spawn Egg
+    buy-price: 200.0
+    sell-price: 0.0
+  trial_spawner:
+    material: TRIAL_SPAWNER
+    name: Trial Spawner
+    buy-price: 0.0
+    sell-price: 0.0
+    enabled: false
+  tropical_fish_spawn_egg:
+    material: TROPICAL_FISH_SPAWN_EGG
+    name: Tropical Fish Spawn Egg
+    buy-price: 200.0
+    sell-price: 0.0
+  turtle_spawn_egg:
+    material: TURTLE_SPAWN_EGG
+    name: Turtle Spawn Egg
+    buy-price: 200.0
+    sell-price: 0.0
+  vex_spawn_egg:
+    material: VEX_SPAWN_EGG
+    name: Vex Spawn Egg
+    buy-price: 200.0
+    sell-price: 0.0
+  villager_spawn_egg:
+    material: VILLAGER_SPAWN_EGG
+    name: Villager Spawn Egg
+    buy-price: 200.0
+    sell-price: 0.0
+  vindicator_spawn_egg:
+    material: VINDICATOR_SPAWN_EGG
+    name: Vindicator Spawn Egg
+    buy-price: 200.0
+    sell-price: 0.0
+  wandering_trader_spawn_egg:
+    material: WANDERING_TRADER_SPAWN_EGG
+    name: Wandering Trader Spawn Egg
+    buy-price: 200.0
+    sell-price: 0.0
+  warden_spawn_egg:
+    material: WARDEN_SPAWN_EGG
+    name: Warden Spawn Egg
+    buy-price: 200.0
+    sell-price: 0.0
+  witch_spawn_egg:
+    material: WITCH_SPAWN_EGG
+    name: Witch Spawn Egg
+    buy-price: 200.0
+    sell-price: 0.0
+  wither_skeleton_spawn_egg:
+    material: WITHER_SKELETON_SPAWN_EGG
+    name: Wither Skeleton Spawn Egg
+    buy-price: 200.0
+    sell-price: 0.0
+  wither_spawn_egg:
+    material: WITHER_SPAWN_EGG
+    name: Wither Spawn Egg
+    buy-price: 200.0
+    sell-price: 0.0
+  wolf_spawn_egg:
+    material: WOLF_SPAWN_EGG
+    name: Wolf Spawn Egg
+    buy-price: 200.0
+    sell-price: 0.0
+  zoglin_spawn_egg:
+    material: ZOGLIN_SPAWN_EGG
+    name: Zoglin Spawn Egg
+    buy-price: 200.0
+    sell-price: 0.0
+  zombie_horse_spawn_egg:
+    material: ZOMBIE_HORSE_SPAWN_EGG
+    name: Zombie Horse Spawn Egg
+    buy-price: 200.0
+    sell-price: 0.0
+  zombie_nautilus_spawn_egg:
+    material: ZOMBIE_NAUTILUS_SPAWN_EGG
+    name: Zombie Nautilus Spawn Egg
+    buy-price: 200.0
+    sell-price: 0.0
+  zombie_villager_spawn_egg:
+    material: ZOMBIE_VILLAGER_SPAWN_EGG
+    name: Zombie Villager Spawn Egg
+    buy-price: 200.0
+    sell-price: 0.0
+  zombified_piglin_spawn_egg:
+    material: ZOMBIFIED_PIGLIN_SPAWN_EGG
+    name: Zombified Piglin Spawn Egg
+    buy-price: 200.0
+    sell-price: 0.0
