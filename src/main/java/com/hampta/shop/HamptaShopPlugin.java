@@ -28,7 +28,11 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.StringUtil;
 
+import java.io.File;
+import java.io.IOException;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -45,12 +49,17 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
     private AuctionHouseDatabase auctionDatabase;
     private BukkitTask expiryTask;
     private YamlConfiguration messages;
+    private YamlConfiguration presets;
+    private File presetsFile;
 
     @Override
     public void onEnable() {
         saveDefaultConfig();
         saveResource("messages.yml", false);
+        saveResource("presets.yml", false);
         messages = YamlConfiguration.loadConfiguration(new java.io.File(getDataFolder(), "messages.yml"));
+        presetsFile = new File(getDataFolder(), "presets.yml");
+        presets = YamlConfiguration.loadConfiguration(presetsFile);
         setupEconomy();
         if (!isEnabled()) {
             return;
@@ -224,25 +233,193 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
     }
 
     private boolean handleAdmin(CommandSender sender, String[] args) {
-        if (args.length == 1 && args[0].equalsIgnoreCase("reload")) {
-            if (!sender.hasPermission("hamptashop.admin")) {
+        if (args.length == 0) {
+            send(sender, "invalid-usage", "usage",
+                    "/hamptashop <reload|preset <name>|preset list|preset save <name>|preset delete <name>|admin ...>");
+            return true;
+        }
+        if (args[0].equalsIgnoreCase("reload") && args.length == 1) {
+            if (!hasAdminPermission(sender, "hamptashop.admin.reload")) {
                 send(sender, "no-permission");
                 return true;
             }
             reloadConfig();
             messages = YamlConfiguration.loadConfiguration(new java.io.File(getDataFolder(), "messages.yml"));
+            presets = YamlConfiguration.loadConfiguration(presetsFile);
             send(sender, "admin-reloaded");
             return true;
         }
+        if (args[0].equalsIgnoreCase("preset")) {
+            return handlePreset(sender, Arrays.copyOfRange(args, 1, args.length));
+        }
         if (args.length >= 2 && args[0].equalsIgnoreCase("admin")) {
-            if (!sender.hasPermission("hamptashop.admin")) {
+            if (!hasAdminPermission(sender, "hamptashop.shop.edit")) {
                 send(sender, "no-permission");
                 return true;
             }
             return handleAdminEdit(sender, Arrays.copyOfRange(args, 1, args.length));
         }
-        send(sender, "invalid-usage", "usage", "/hamptashop reload | /hamptashop admin <addcategory|additem|setprice>");
+        send(sender, "invalid-usage", "usage",
+                "/hamptashop <reload|preset <name>|preset list|preset save <name>|preset delete <name>|admin ...>");
         return true;
+    }
+
+    private boolean handlePreset(CommandSender sender, String[] args) {
+        if (args.length == 0) {
+            send(sender, "invalid-usage", "usage", "/hamptashop preset <name|list|save|delete>");
+            return true;
+        }
+        if (args[0].equalsIgnoreCase("list")) {
+            List<String> names = presetNames();
+            send(sender, names.isEmpty() ? "preset-none" : "preset-list", "presets",
+                    names.isEmpty() ? "" : String.join("&7, &f", names));
+            return true;
+        }
+        if (args[0].equalsIgnoreCase("save")) {
+            if (!hasAdminPermission(sender, "hamptashop.preset.manage")) {
+                send(sender, "no-permission");
+                return true;
+            }
+            if (args.length != 2 || !validId(args[1].toLowerCase(Locale.ROOT))) {
+                send(sender, "invalid-usage", "usage", "/hamptashop preset save <name>");
+                return true;
+            }
+            String id = args[1].toLowerCase(Locale.ROOT);
+            if (findPreset(id) != null) {
+                send(sender, "preset-exists", "preset", id);
+                return true;
+            }
+            saveCurrentPreset(sender, id);
+            return true;
+        }
+        if (args[0].equalsIgnoreCase("delete")) {
+            if (!hasAdminPermission(sender, "hamptashop.preset.manage")) {
+                send(sender, "no-permission");
+                return true;
+            }
+            if (args.length != 2) {
+                send(sender, "invalid-usage", "usage", "/hamptashop preset delete <name>");
+                return true;
+            }
+            String id = args[1].toLowerCase(Locale.ROOT);
+            if (presets.getConfigurationSection("presets." + id) != null) {
+                send(sender, "preset-builtin", "preset", id);
+            } else if (presets.getConfigurationSection("custom-presets." + id) == null) {
+                send(sender, "preset-not-found", "preset", id);
+            } else {
+                presets.set("custom-presets." + id, null);
+                savePresets(sender);
+            }
+            return true;
+        }
+        if (!hasAdminPermission(sender, "hamptashop.preset.apply")) {
+            send(sender, "no-permission");
+            return true;
+        }
+        if (args.length != 1) {
+            send(sender, "invalid-usage", "usage", "/hamptashop preset <name>");
+            return true;
+        }
+        String id = args[0].toLowerCase(Locale.ROOT);
+        ConfigurationSection preset = findPreset(id);
+        if (preset == null) {
+            send(sender, "preset-not-found", "preset", id);
+            return true;
+        }
+        applyPreset(sender, id, preset);
+        return true;
+    }
+
+    private ConfigurationSection findPreset(String id) {
+        ConfigurationSection custom = presets.getConfigurationSection("custom-presets." + id);
+        return custom != null ? custom : presets.getConfigurationSection("presets." + id);
+    }
+
+    private List<String> presetNames() {
+        List<String> names = new ArrayList<>();
+        for (String root : List.of("presets", "custom-presets")) {
+            ConfigurationSection section = presets.getConfigurationSection(root);
+            if (section != null) {
+                names.addAll(section.getKeys(false));
+            }
+        }
+        names.sort(String.CASE_INSENSITIVE_ORDER);
+        return names;
+    }
+
+    private void saveCurrentPreset(CommandSender sender, String id) {
+        try {
+            copyConfigSectionToPresets("shop", "custom-presets." + id + ".shop");
+            copyConfigSectionToPresets("auction", "custom-presets." + id + ".auction");
+            presets.save(presetsFile);
+            send(sender, "preset-saved", "preset", id);
+        } catch (IOException exception) {
+            getLogger().log(Level.SEVERE, "Could not save shop preset '" + id + "'.", exception);
+            send(sender, "preset-save-error");
+        }
+    }
+
+    private void copyConfigSectionToPresets(String source, String target) {
+        ConfigurationSection section = getConfig().getConfigurationSection(source);
+        if (section == null) {
+            return;
+        }
+        for (Map.Entry<String, Object> entry : section.getValues(true).entrySet()) {
+            if (!(entry.getValue() instanceof ConfigurationSection)) {
+                presets.set(target + "." + entry.getKey(), entry.getValue());
+            }
+        }
+    }
+
+    private void applyPreset(CommandSender sender, String id, ConfigurationSection preset) {
+        File backupFolder = new File(getDataFolder(), "backups");
+        if (!backupFolder.exists() && !backupFolder.mkdirs()) {
+            getLogger().severe("Could not create the config backup directory.");
+            send(sender, "preset-backup-error");
+            return;
+        }
+        String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss-SSS"));
+        File backup = new File(backupFolder, "config-" + timestamp + ".yml");
+        try {
+            getConfig().save(backup);
+        } catch (IOException exception) {
+            getLogger().log(Level.SEVERE, "Could not back up the current config before applying a preset.", exception);
+            send(sender, "preset-backup-error");
+            return;
+        }
+        copyPresetSection(preset, "shop");
+        copyPresetSection(preset, "auction");
+        saveConfig();
+        reloadConfig();
+        send(sender, "preset-applied", "preset", id, "backup", backup.getName());
+        getLogger().info(sender.getName() + " applied preset '" + id + "'. Backup: " + backup.getName());
+    }
+
+    private void copyPresetSection(ConfigurationSection preset, String sectionName) {
+        ConfigurationSection values = preset.getConfigurationSection(sectionName);
+        if (values == null) {
+            return;
+        }
+        getConfig().set(sectionName, null);
+        for (Map.Entry<String, Object> entry : values.getValues(true).entrySet()) {
+            if (!(entry.getValue() instanceof ConfigurationSection)) {
+                getConfig().set(sectionName + "." + entry.getKey(), entry.getValue());
+            }
+        }
+    }
+
+    private void savePresets(CommandSender sender) {
+        try {
+            presets.save(presetsFile);
+            send(sender, "preset-deleted");
+        } catch (IOException exception) {
+            getLogger().log(Level.SEVERE, "Could not save preset file.", exception);
+            send(sender, "preset-save-error");
+        }
+    }
+
+    private boolean hasAdminPermission(CommandSender sender, String permission) {
+        return sender.hasPermission("hamptashop.admin") || sender.hasPermission(permission);
     }
 
     private boolean handleAdminEdit(CommandSender sender, String[] args) {
@@ -379,8 +556,8 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
                 if (!lore.isEmpty()) {
                     lore.add("");
                 }
-                lore.add(color("&aBuy: &f" + formatCurrency(buyPrice(id)) + " &7per item"));
-                lore.add(color("&cSell: &f" + formatCurrency(sellPrice(id)) + " &7per item"));
+                lore.add(color("&aBuy: &f" + formatCurrency(buyPrice(id, player)) + " &7per item"));
+                lore.add(color("&cSell: &f" + formatCurrency(sellPrice(id, player)) + " &7per item"));
                 lore.add(color("&8Left-click: buy 1"));
                 lore.add(color("&8Shift-left: buy 16"));
                 lore.add(color("&8Right-click: sell 1"));
@@ -514,7 +691,7 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
     }
 
     private void buyFromShop(Player player, String id, int requestedAmount) {
-        double unitPrice = buyPrice(id);
+        double unitPrice = buyPrice(id, player);
         if (unitPrice <= 0) {
             send(player, "unknown-item");
             return;
@@ -547,7 +724,7 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
     }
 
     private int sellMatching(Player player, String id, int requestedAmount) {
-        double unitPrice = sellPrice(id);
+        double unitPrice = sellPrice(id, player);
         if (unitPrice <= 0) {
             return 0;
         }
@@ -570,8 +747,9 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
     }
 
     private void sellHeld(Player player, String id, ItemStack held) {
-        double total = sellPrice(id) * held.getAmount();
-        if (sellPrice(id) <= 0 || !Double.isFinite(total) || total <= 0) {
+        double unitPrice = sellPrice(id, player);
+        double total = unitPrice * held.getAmount();
+        if (unitPrice <= 0 || !Double.isFinite(total) || total <= 0) {
             send(player, "unknown-item");
             return;
         }
@@ -908,12 +1086,34 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
         return material != null && candidate.getType() == material;
     }
 
-    private double buyPrice(String id) {
-        return Math.max(0, getConfig().getDouble("shop.items." + id + ".buy-price", 0));
+    private double buyPrice(String id, Player player) {
+        double base = Math.max(0, getConfig().getDouble("shop.items." + id + ".buy-price", 0));
+        return base * (1.0 - bestPriceModifier(player, "buy-discount-percent") / 100.0);
     }
 
-    private double sellPrice(String id) {
-        return Math.max(0, getConfig().getDouble("shop.items." + id + ".sell-price", 0));
+    private double sellPrice(String id, Player player) {
+        double base = Math.max(0, getConfig().getDouble("shop.items." + id + ".sell-price", 0));
+        return base * (1.0 + bestPriceModifier(player, "sell-bonus-percent") / 100.0);
+    }
+
+    private double bestPriceModifier(Player player, String modifier) {
+        ConfigurationSection modifiers = getConfig().getConfigurationSection("pricing.permission-modifiers");
+        if (modifiers == null) {
+            return 0;
+        }
+        double best = 0;
+        double maximum = modifier.equals("buy-discount-percent") ? 90.0 : 100.0;
+        for (String id : modifiers.getKeys(false)) {
+            String path = "pricing.permission-modifiers." + id;
+            String permission = getConfig().getString(path + ".permission", "");
+            if (!permission.isBlank() && player.hasPermission(permission)) {
+                double configured = getConfig().getDouble(path + "." + modifier, 0);
+                if (Double.isFinite(configured)) {
+                    best = Math.max(best, Math.min(maximum, Math.max(0, configured)));
+                }
+            }
+        }
+        return best;
     }
 
     private boolean matchesSearch(String id, String query) {
@@ -1061,7 +1261,19 @@ public final class HamptaShopPlugin extends JavaPlugin implements Listener, Comm
             choices.addAll(List.of("sell", "mine", "cancel", "claim"));
         } else if (command.getName().equalsIgnoreCase("hamptashop")) {
             if (args.length == 1) {
-                choices.addAll(List.of("reload", "admin"));
+                choices.addAll(List.of("reload", "preset", "admin"));
+            } else if (args.length == 2 && args[0].equalsIgnoreCase("preset")) {
+                choices.addAll(List.of("list", "save", "delete"));
+                choices.addAll(presetNames());
+            } else if (args.length == 3 && args[0].equalsIgnoreCase("preset")
+                    && args[1].equalsIgnoreCase("delete")) {
+                ConfigurationSection customPresets = presets.getConfigurationSection("custom-presets");
+                if (customPresets != null) {
+                    choices.addAll(customPresets.getKeys(false));
+                }
+            } else if (args.length == 3 && args[0].equalsIgnoreCase("preset")
+                    && args[1].equalsIgnoreCase("save")) {
+                choices.addAll(List.of("survival", "creative", "hardcore", "generous"));
             } else if (args.length == 2 && args[0].equalsIgnoreCase("admin")) {
                 choices.addAll(List.of("addcategory", "additem", "setprice"));
             } else if (args.length == 3 && args[0].equalsIgnoreCase("admin")

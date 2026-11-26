@@ -5,7 +5,7 @@ api-version: '1.20'
 description: A polished economy shop and player auction house.
 author: hamterlord66
 depend: [Vault]
-softdepend: [PlaceholderAPI]
+softdepend: [PlaceholderAPI, LuckPerms]
 commands:
   shop:
     description: Browse the Hampta Shop.
@@ -20,7 +20,7 @@ commands:
     aliases: [auction, auctionhouse]
   hamptashop:
     description: Hampta Shop administration.
-    usage: /hamptashop <reload|admin>
+    usage: /hamptashop <reload|preset|admin>
     aliases: [hs]
 permissions:
   hamptashop.use:
@@ -33,5 +33,17 @@ permissions:
     description: Create and manage auction listings.
     default: true
   hamptashop.admin:
-    description: Manage Hampta Shop configuration in-game.
+    description: Full Hampta Shop administration access.
+    default: op
+  hamptashop.admin.reload:
+    description: Reload Hampta Shop configuration files.
+    default: op
+  hamptashop.shop.edit:
+    description: Add categories and manage server-shop items and prices.
+    default: op
+  hamptashop.preset.apply:
+    description: Apply a saved economy preset.
+    default: op
+  hamptashop.preset.manage:
+    description: Save and delete custom economy presets.
     default: op

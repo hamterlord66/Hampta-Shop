@@ -62,6 +62,17 @@ shop:
       sell-price: 30.0
       slot: 22
 
+pricing:
+  permission-modifiers:
+    vip:
+      permission: hamptashop.discount.vip
+      buy-discount-percent: 10.0
+      sell-bonus-percent: 10.0
+    elite:
+      permission: hamptashop.discount.elite
+      buy-discount-percent: 20.0
+      sell-bonus-percent: 20.0
+
 auction:
   listing-fee: 0.0
   sale-fee-percent: 5.0
